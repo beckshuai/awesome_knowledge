@@ -6,14 +6,18 @@
     <title>awesome_knowledge · 知识图谱导航站</title>
     <style>
       :root {
-        --bg: #0b1020;
-        --panel: rgba(18, 26, 47, 0.88);
+        --bg: #08101f;
+        --bg-2: #111b34;
+        --panel: rgba(15, 24, 44, 0.92);
+        --panel-2: rgba(22, 33, 62, 0.92);
         --line: rgba(148, 163, 184, 0.18);
-        --text: #e7eefc;
-        --muted: #9eb0cf;
+        --text: #e8eefc;
+        --muted: #93a6c7;
         --blue: #4ea1ff;
         --green: #46d6a9;
         --orange: #ffb454;
+        --purple: #b084ff;
+        --pink: #fb7185;
         --shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
       }
 
@@ -21,10 +25,14 @@
         box-sizing: border-box;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 0;
         font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: radial-gradient(circle at top, #16254a, var(--bg) 42%);
+        background: radial-gradient(circle at top, #1a2c55, var(--bg) 42%);
         color: var(--text);
       }
 
@@ -34,17 +42,27 @@
       }
 
       .page {
-        max-width: 1240px;
+        max-width: 1320px;
         margin: 0 auto;
-        padding: 28px 20px 48px;
+        padding: 28px 20px 54px;
+      }
+
+      .hero,
+      .panel,
+      .graph-card,
+      .preview-card,
+      .feature-card,
+      .future-card,
+      .code-box {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
       }
 
       .hero {
-        padding: 28px;
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        background: linear-gradient(135deg, rgba(78, 161, 255, 0.16), rgba(176, 132, 255, 0.08));
-        box-shadow: var(--shadow);
+        padding: 30px;
+        background: linear-gradient(135deg, rgba(78, 161, 255, 0.18), rgba(176, 132, 255, 0.1));
       }
 
       .eyebrow {
@@ -54,33 +72,71 @@
         background: rgba(78, 161, 255, 0.14);
         color: #d9e8ff;
         font-size: 12px;
+        letter-spacing: 0.02em;
       }
 
       h1 {
-        margin: 14px 0 10px;
-        font-size: 38px;
-        line-height: 1.15;
+        margin: 14px 0 12px;
+        font-size: 40px;
+        line-height: 1.14;
       }
 
       .hero p {
         margin: 0;
         color: #c7d6ef;
-        line-height: 1.8;
-        max-width: 900px;
+        line-height: 1.82;
+        max-width: 940px;
+      }
+
+      .hero-actions,
+      .card-actions,
+      .filter-row,
+      .section-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
       }
 
       .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
         margin-top: 18px;
       }
 
-      .btn {
+      .stat {
+        padding: 16px 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(10, 16, 31, 0.34);
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stat-value {
+        margin-top: 8px;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .btn,
+      .filter-chip,
+      .tag,
+      .status {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+      }
+
+      .btn {
         padding: 12px 16px;
         border-radius: 14px;
         border: 1px solid var(--line);
@@ -90,35 +146,118 @@
       }
 
       .btn.primary {
-        background: rgba(78, 161, 255, 0.2);
-        border-color: rgba(78, 161, 255, 0.45);
+        background: rgba(78, 161, 255, 0.18);
+        border-color: rgba(78, 161, 255, 0.42);
+      }
+
+      .btn.secondary {
+        background: rgba(70, 214, 169, 0.12);
+        border-color: rgba(70, 214, 169, 0.28);
       }
 
       .section {
-        margin-top: 22px;
+        margin-top: 24px;
+      }
+
+      .section-head {
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 14px;
       }
 
       .section-title {
-        margin: 0 0 14px;
-        font-size: 20px;
+        margin: 0;
+        font-size: 22px;
       }
 
-      .grid {
+      .section-subtitle {
+        margin-top: 8px;
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 760px;
+      }
+
+      .toolbar {
+        padding: 18px;
+      }
+
+      .filter-row {
+        align-items: center;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 240px;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 14px;
+        outline: none;
+        background: rgba(8, 15, 29, 0.96);
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .filter-chip {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(13, 20, 37, 0.9);
+        color: #d7e4fb;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .filter-chip.active {
+        border-color: rgba(78, 161, 255, 0.38);
+        background: rgba(78, 161, 255, 0.16);
+      }
+
+      .result-count {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .cards-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
+        gap: 18px;
       }
 
-      .card,
-      .mini-card,
-      .code-box {
-        border: 1px solid var(--line);
-        border-radius: 22px;
-        background: var(--panel);
-        box-shadow: var(--shadow);
+      .graph-card {
+        overflow: hidden;
       }
 
-      .card {
+      .preview-frame {
+        position: relative;
+        height: 280px;
+        background: linear-gradient(180deg, rgba(12, 18, 34, 0.98), rgba(18, 26, 47, 0.98));
+        border-bottom: 1px solid var(--line);
+      }
+
+      .preview-frame iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #0b1020;
+        pointer-events: none;
+        transform: scale(0.86);
+        transform-origin: top left;
+        width: calc(100% / 0.86);
+        height: calc(100% / 0.86);
+      }
+
+      .preview-mask {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(8, 15, 29, 0) 0%, rgba(8, 15, 29, 0.16) 64%, rgba(8, 15, 29, 0.52) 100%);
+      }
+
+      .card-content {
         padding: 20px;
       }
 
@@ -129,15 +268,31 @@
         margin-bottom: 12px;
       }
 
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+      .tag,
+      .status {
         padding: 6px 10px;
         border-radius: 999px;
         font-size: 12px;
-        color: #d8e8ff;
+      }
+
+      .tag {
+        color: #d9e8ff;
         background: rgba(255, 255, 255, 0.04);
+      }
+
+      .status.planned {
+        color: #fff0d6;
+        background: rgba(255, 180, 84, 0.12);
+      }
+
+      .status.researching {
+        color: #def8f0;
+        background: rgba(70, 214, 169, 0.12);
+      }
+
+      .status.live {
+        color: #d9e8ff;
+        background: rgba(78, 161, 255, 0.14);
       }
 
       .dot {
@@ -147,54 +302,116 @@
         display: inline-block;
       }
 
-      .card h3 {
+      .graph-card h3,
+      .future-card h3 {
         margin: 0;
         font-size: 22px;
       }
 
-      .card p {
+      .graph-card p,
+      .future-card p,
+      .feature-card p {
         margin: 12px 0 0;
         color: #bfd0ee;
-        line-height: 1.7;
+        line-height: 1.74;
       }
 
       .features {
         margin: 16px 0 0;
         padding: 0 0 0 18px;
         color: #dce8ff;
-        line-height: 1.8;
+        line-height: 1.86;
       }
 
       .card-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
         margin-top: 18px;
       }
 
-      .mini-grid {
+      .hidden {
+        display: none !important;
+      }
+
+      .info-grid,
+      .future-grid,
+      .metrics-grid,
+      .update-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 16px;
       }
 
-      .mini-card {
-        padding: 18px;
+      .feature-card,
+      .future-card,
+      .code-box {
+        padding: 20px;
       }
 
-      .mini-card h4 {
+      .feature-card h4 {
         margin: 0 0 10px;
-        font-size: 16px;
+        font-size: 17px;
       }
 
-      .mini-card p {
+      .future-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .future-list {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: #dce8ff;
+        line-height: 1.8;
+      }
+
+      .future-actions {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .metric-card,
+      .update-card {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: var(--panel-2);
+        box-shadow: var(--shadow);
+      }
+
+      .metric-card h4,
+      .update-card h4 {
+        margin: 0 0 10px;
+        font-size: 17px;
+      }
+
+      .metric-card p,
+      .update-card p {
         margin: 0;
         color: var(--muted);
-        line-height: 1.7;
+        line-height: 1.72;
       }
 
-      .code-box {
-        padding: 18px;
+      .metric-number {
+        margin-top: 10px;
+        font-size: 30px;
+        font-weight: 700;
+        color: #f3f7ff;
+      }
+
+      .update-meta {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .update-list {
+        margin: 12px 0 0;
+        padding-left: 18px;
+        color: #dce8ff;
+        line-height: 1.8;
       }
 
       code,
@@ -203,31 +420,63 @@
       }
 
       pre {
-        margin: 10px 0 0;
+        margin: 12px 0 0;
         padding: 14px;
         overflow: auto;
         border-radius: 14px;
         border: 1px solid rgba(148, 163, 184, 0.14);
-        background: rgba(12, 18, 34, 0.95);
+        background: rgba(7, 14, 27, 0.95);
         color: #dce8ff;
-        line-height: 1.7;
+        line-height: 1.72;
+      }
+
+      .empty-state {
+        padding: 28px;
+        text-align: center;
+        color: var(--muted);
+        border: 1px dashed rgba(148, 163, 184, 0.24);
+        border-radius: 20px;
+        background: rgba(12, 19, 35, 0.5);
       }
 
       .footer {
-        margin-top: 24px;
+        margin-top: 28px;
         color: var(--muted);
         font-size: 13px;
         text-align: center;
       }
 
-      @media (max-width: 900px) {
-        .grid,
-        .mini-grid {
+      @media (max-width: 1080px) {
+        .cards-grid,
+        .info-grid,
+        .future-grid,
+        .metrics-grid,
+        .update-grid,
+        .hero-stats {
           grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          padding: 18px 14px 36px;
         }
 
         h1 {
           font-size: 30px;
+        }
+
+        .hero,
+        .panel,
+        .graph-card,
+        .feature-card,
+        .future-card,
+        .code-box {
+          border-radius: 18px;
+        }
+
+        .preview-frame {
+          height: 220px;
         }
       }
     </style>
@@ -236,84 +485,294 @@
     <div class="page">
       <section class="hero">
         <span class="eyebrow">awesome_knowledge · 总导航站点</span>
-        <h1>知识图谱统一入口</h1>
+        <h1>知识图谱统一入口与预览中心</h1>
         <p>
-          这里是仓库首页，也是 GitHub Pages 的统一导航站点。你可以从这里进入已经完成的交互式图谱页面，分别查看知识图谱、发展轨迹和关联关系。当前已收录两个主题：孩子教育、经济学。
+          这里是仓库首页，也是 GitHub Pages 的总导航站点。除了直接进入图谱页面，现在还支持首页搜索、分类筛选、实时预览，以及未来图谱目录管理。你可以把它当成一个持续扩展的知识图谱总站。
         </p>
         <div class="hero-actions">
-          <a class="btn primary" href="./knowledge_graphs/child_education/">进入孩子教育图谱</a>
-          <a class="btn" href="./knowledge_graphs/economics/">进入经济学图谱</a>
+          <a class="btn primary" href="#live-graphs">查看已上线图谱</a>
+          <a class="btn secondary" href="#future-directory">查看未来图谱目录</a>
+          <a class="btn" href="https://beckshuai.github.io/awesome_knowledge/" target="_blank" rel="noreferrer">打开 GitHub Pages</a>
           <a class="btn" href="https://github.com/beckshuai/awesome_knowledge" target="_blank" rel="noreferrer">查看 GitHub 仓库</a>
         </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-label">已上线图谱</div>
+            <div class="stat-value">2</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">规划中主题</div>
+            <div class="stat-value">4</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">访问入口</div>
+            <div class="stat-value">Pages / 本地</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">当前模式</div>
+            <div class="stat-value">可交互导航</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section panel toolbar" id="live-graphs">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">图谱搜索与分类筛选</h2>
+            <div class="section-subtitle">
+              支持按主题分类筛选，也可以通过关键词搜索标题、描述和标签。下方卡片提供实时站点预览，相当于首页版的“截图预览”。
+            </div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="search-box">
+            <input id="searchInput" type="text" placeholder="搜索：孩子教育、经济学、心理学、行为、脑科学……" />
+          </div>
+          <button class="filter-chip active" data-filter="all">全部</button>
+          <button class="filter-chip" data-filter="教育">教育</button>
+          <button class="filter-chip" data-filter="社会科学">社会科学</button>
+          <button class="filter-chip" data-filter="已上线">已上线</button>
+          <button class="filter-chip" data-filter="规划中">规划中</button>
+        </div>
+        <div class="result-count" id="resultCount">当前共显示 2 个已上线图谱</div>
       </section>
 
       <section class="section">
-        <h2 class="section-title">图谱入口</h2>
-        <div class="grid">
-          <article class="card">
-            <div class="tag-row">
-              <span class="tag"><span class="dot" style="background: var(--blue)"></span>心理学</span>
-              <span class="tag"><span class="dot" style="background: var(--green)"></span>人类学</span>
-              <span class="tag"><span class="dot" style="background: var(--orange)"></span>脑科学</span>
+        <div class="cards-grid" id="graphGrid">
+          <article
+            class="graph-card graph-item"
+            data-kind="live"
+            data-category="教育 社会科学 已上线"
+            data-search="孩子教育 儿童教育 心理学 人类学 脑科学 养育 依恋 执行功能"
+          >
+            <div class="preview-frame">
+              <iframe src="./knowledge_graphs/child_education/" title="孩子教育知识图谱预览"></iframe>
+              <div class="preview-mask"></div>
             </div>
-            <h3>孩子教育知识图谱</h3>
-            <p>
-              聚焦儿童教育与养育，覆盖主动建构学习、最近发展区、依恋、合作抚育、执行功能、脑可塑性等核心主题。
-            </p>
-            <ul class="features">
-              <li>交互式知识图谱</li>
-              <li>心理学 / 人类学 / 脑科学发展轨迹</li>
-              <li>节点间关联关系浏览</li>
-            </ul>
-            <div class="card-actions">
-              <a class="btn primary" href="./knowledge_graphs/child_education/">打开图谱</a>
-              <a class="btn" href="./knowledge_graphs/child_education/graph.json">查看数据</a>
+            <div class="card-content">
+              <div class="tag-row">
+                <span class="status live">已上线</span>
+                <span class="tag"><span class="dot" style="background: var(--blue)"></span>心理学</span>
+                <span class="tag"><span class="dot" style="background: var(--green)"></span>人类学</span>
+                <span class="tag"><span class="dot" style="background: var(--orange)"></span>脑科学</span>
+              </div>
+              <h3>孩子教育知识图谱</h3>
+              <p>
+                聚焦儿童教育与养育，覆盖主动建构学习、最近发展区、依恋、安全感、合作抚育、执行功能、脑可塑性等核心主题。
+              </p>
+              <ul class="features">
+                <li>交互式知识图谱</li>
+                <li>心理学 / 人类学 / 脑科学发展轨迹</li>
+                <li>节点间关联关系浏览</li>
+              </ul>
+              <div class="card-actions">
+                <a class="btn primary" href="./knowledge_graphs/child_education/">打开图谱</a>
+                <a class="btn" href="./knowledge_graphs/child_education/graph.json">查看数据</a>
+              </div>
             </div>
           </article>
 
-          <article class="card">
-            <div class="tag-row">
-              <span class="tag"><span class="dot" style="background: #f59e0b"></span>思想史</span>
-              <span class="tag"><span class="dot" style="background: #a78bfa"></span>学派</span>
-              <span class="tag"><span class="dot" style="background: #fb7185"></span>人物与著作</span>
+          <article
+            class="graph-card graph-item"
+            data-kind="live"
+            data-category="社会科学 已上线"
+            data-search="经济学 思想史 学派 人物 概念 著作 行为经济学 制度经济学 凯恩斯"
+          >
+            <div class="preview-frame">
+              <iframe src="./knowledge_graphs/economics/" title="经济学知识图谱预览"></iframe>
+              <div class="preview-mask"></div>
             </div>
-            <h3>经济学知识图谱</h3>
-            <p>
-              聚焦经济学思想演化、主要学派、关键人物、概念与著作，支持用交互方式查看历史脉络和方法关系。
-            </p>
-            <ul class="features">
-              <li>学派 / 人物 / 概念关系网络</li>
-              <li>思想史时间线</li>
-              <li>关联矩阵与细节说明</li>
-            </ul>
-            <div class="card-actions">
-              <a class="btn primary" href="./knowledge_graphs/economics/">打开图谱</a>
-              <a class="btn" href="./knowledge_graphs/economics/graph.json">查看数据</a>
+            <div class="card-content">
+              <div class="tag-row">
+                <span class="status live">已上线</span>
+                <span class="tag"><span class="dot" style="background: #f59e0b"></span>思想史</span>
+                <span class="tag"><span class="dot" style="background: var(--purple)"></span>学派</span>
+                <span class="tag"><span class="dot" style="background: var(--pink)"></span>人物与著作</span>
+              </div>
+              <h3>经济学知识图谱</h3>
+              <p>
+                聚焦经济学思想演化、主要学派、关键人物、概念与著作，支持用交互方式查看历史脉络、理论关系和方法转向。
+              </p>
+              <ul class="features">
+                <li>学派 / 人物 / 概念关系网络</li>
+                <li>思想史时间线</li>
+                <li>关联矩阵与细节说明</li>
+              </ul>
+              <div class="card-actions">
+                <a class="btn primary" href="./knowledge_graphs/economics/">打开图谱</a>
+                <a class="btn" href="./knowledge_graphs/economics/graph.json">查看数据</a>
+              </div>
             </div>
           </article>
+        </div>
+        <div class="empty-state hidden" id="emptyState">当前筛选条件下没有匹配的图谱，请尝试更换关键词或分类。</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">主题统计与更新日志</h2>
+            <div class="section-subtitle">首页新增一块运营视角区域，用来快速说明站点规模、当前进度和最近更新内容。</div>
+          </div>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>主题覆盖</h4>
+            <p>当前站点已经形成“已上线内容 + 未来目录”的双层结构。</p>
+            <div class="metric-number">6</div>
+          </div>
+          <div class="metric-card">
+            <h4>已上线图谱</h4>
+            <p>可以直接交互访问并支持数据浏览的图谱页面数量。</p>
+            <div class="metric-number">2</div>
+          </div>
+          <div class="metric-card">
+            <h4>规划中主题</h4>
+            <p>已进入目录管理、可继续扩展为正式图谱页面的主题数量。</p>
+            <div class="metric-number">4</div>
+          </div>
+          <div class="metric-card">
+            <h4>访问模式</h4>
+            <p>支持 GitHub Pages 在线访问，也支持本地静态服务器统一预览。</p>
+            <div class="metric-number">Pages + Local</div>
+          </div>
+        </div>
+        <div class="update-grid" style="margin-top: 16px;">
+          <div class="update-card">
+            <h4>最近更新</h4>
+            <div class="update-meta">2026-05-19</div>
+            <ul class="update-list">
+              <li>新增首页搜索、分类筛选和实时预览</li>
+              <li>新增未来图谱目录</li>
+              <li>README 改为正式项目入口说明</li>
+            </ul>
+          </div>
+          <div class="update-card">
+            <h4>下一阶段建议</h4>
+            <div class="update-meta">建议的后续路线</div>
+            <ul class="update-list">
+              <li>为未来图谱逐个填充结构化数据</li>
+              <li>增加总站级的全文搜索</li>
+              <li>形成跨主题知识链接</li>
+            </ul>
+          </div>
         </div>
       </section>
 
       <section class="section">
-        <h2 class="section-title">访问方式</h2>
-        <div class="mini-grid">
-          <div class="mini-card">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">项目入口说明</h2>
+            <div class="section-subtitle">除了在线访问，也可以从本地直接运行整个仓库根目录，把首页作为统一入口。</div>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="feature-card">
             <h4>GitHub Pages 在线访问</h4>
             <p>
-              启用 Pages 后，可以直接访问仓库首页站点，并从首页进入两个主题图谱。如果 Pages 发布成功，项目地址将是：<code>https://beckshuai.github.io/awesome_knowledge/</code>
+              首页站点地址为 <code>https://beckshuai.github.io/awesome_knowledge/</code>。从这里可以继续进入孩子教育图谱和经济学图谱两个子站。
             </p>
           </div>
-          <div class="mini-card">
+          <div class="feature-card">
             <h4>本地浏览器预览</h4>
             <p>
-              推荐通过本地静态服务器打开，而不是直接双击 HTML。因为页面内部通过 <code>fetch</code> 加载 JSON 数据，需要 HTTP 访问环境。
+              推荐通过静态服务器打开仓库根目录，而不是直接双击 HTML 文件。因为图谱页面内部通过 <code>fetch</code> 加载 JSON 数据，需要 HTTP 环境。
             </p>
           </div>
         </div>
       </section>
 
       <section class="section">
-        <h2 class="section-title">本地运行示例</h2>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">未来图谱目录</h2>
+            <div class="section-subtitle">
+              这是首页新增的“未来图谱目录”区域，用来明确后续计划主题，让整个站点从“已上线内容”扩展为“持续演进的知识图谱站”。
+            </div>
+          </div>
+        </div>
+        <div class="future-grid" id="future-directory">
+          <article class="future-card graph-item" data-kind="future" data-category="规划中 教育" data-search="学习科学 认知科学 元认知 教学设计 课堂学习">
+            <div class="future-meta">
+              <span class="status planned">规划中</span>
+              <span class="tag">教育</span>
+              <span class="tag">学习科学</span>
+            </div>
+            <h3>学习科学知识图谱</h3>
+            <p>聚焦有效学习、认知负荷、元认知、练习设计、反馈机制与课堂应用。</p>
+            <ul class="future-list">
+              <li>认知科学与教学设计的连接</li>
+              <li>学习策略与实践方法映射</li>
+              <li>适合和孩子教育图谱形成互补</li>
+            </ul>
+            <div class="future-actions">
+              <a class="btn primary" href="./knowledge_graphs/learning_science/">打开模板页</a>
+            </div>
+          </article>
+
+          <article class="future-card graph-item" data-kind="future" data-category="规划中 社会科学" data-search="社会学 家庭 代际关系 教育分层 阶层流动">
+            <div class="future-meta">
+              <span class="status researching">调研中</span>
+              <span class="tag">社会科学</span>
+              <span class="tag">家庭社会学</span>
+            </div>
+            <h3>家庭与社会化知识图谱</h3>
+            <p>聚焦家庭结构、代际关系、社会化机制、教育分层与文化资本。</p>
+            <ul class="future-list">
+              <li>补足孩子教育图谱里的社会结构视角</li>
+              <li>适合与人类学、教育学内容联动</li>
+              <li>可形成跨学科家庭教育地图</li>
+            </ul>
+            <div class="future-actions">
+              <a class="btn primary" href="./knowledge_graphs/family_socialization/">打开模板页</a>
+            </div>
+          </article>
+
+          <article class="future-card graph-item" data-kind="future" data-category="规划中 技术" data-search="AI 人工智能 机器学习 大模型 agent 知识表示">
+            <div class="future-meta">
+              <span class="status planned">规划中</span>
+              <span class="tag">技术</span>
+              <span class="tag">人工智能</span>
+            </div>
+            <h3>AI 与知识表示图谱</h3>
+            <p>聚焦大模型、Agent、知识表示、推理链条和人机协作。</p>
+            <ul class="future-list">
+              <li>适合作为技术主题主入口</li>
+              <li>可扩展到工具链、提示工程、评测</li>
+              <li>与当前知识图谱工程方法可复用</li>
+            </ul>
+            <div class="future-actions">
+              <a class="btn primary" href="./knowledge_graphs/ai_knowledge_representation/">打开模板页</a>
+            </div>
+          </article>
+
+          <article class="future-card graph-item" data-kind="future" data-category="规划中 人文" data-search="哲学 伦理学 认知哲学 教育哲学 美德 幸福">
+            <div class="future-meta">
+              <span class="status planned">规划中</span>
+              <span class="tag">人文</span>
+              <span class="tag">哲学</span>
+            </div>
+            <h3>哲学与教育观知识图谱</h3>
+            <p>聚焦教育哲学、伦理学、人格成长、自由与纪律、幸福与德性。</p>
+            <ul class="future-list">
+              <li>帮助把“方法”延伸到“价值观”层面</li>
+              <li>可与孩子教育主题深度联动</li>
+              <li>适合做长期知识沉淀</li>
+            </ul>
+            <div class="future-actions">
+              <a class="btn primary" href="./knowledge_graphs/philosophy_education/">打开模板页</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">本地运行示例</h2>
+            <div class="section-subtitle">把仓库根目录作为静态站点根目录，就可以直接从首页进入所有图谱。</div>
+          </div>
+        </div>
         <div class="code-box">
           <div>在仓库根目录执行：</div>
           <pre>cd "/Users/bytedance/repos/github/awesome_knowledge"
@@ -324,9 +783,62 @@ python3 -m http.server 8000</pre>
         </div>
       </section>
 
-      <div class="footer">
-        awesome_knowledge · GitHub Pages / 本地浏览器统一入口
-      </div>
+      <div class="footer">awesome_knowledge · GitHub Pages / 本地浏览器统一入口 · 持续扩展中的知识图谱站点</div>
     </div>
+
+    <script>
+      const searchInput = document.getElementById('searchInput');
+      const filterButtons = Array.from(document.querySelectorAll('.filter-chip'));
+      const graphItems = Array.from(document.querySelectorAll('.graph-item'));
+      const resultCount = document.getElementById('resultCount');
+      const emptyState = document.getElementById('emptyState');
+
+      const state = {
+        filter: 'all',
+        keyword: ''
+      };
+
+      function normalize(text) {
+        return String(text || '').trim().toLowerCase();
+      }
+
+      function matchesItem(item) {
+        const categoryText = normalize(item.dataset.category);
+        const searchText = normalize(item.dataset.search);
+        const keyword = normalize(state.keyword);
+        const filter = normalize(state.filter);
+        const filterMatched = filter === 'all' || categoryText.includes(filter);
+        const keywordMatched = !keyword || searchText.includes(keyword) || categoryText.includes(keyword);
+        return filterMatched && keywordMatched;
+      }
+
+      function renderFilters() {
+        let visibleCount = 0;
+        graphItems.forEach((item) => {
+          const matched = matchesItem(item);
+          item.classList.toggle('hidden', !matched);
+          if (matched && item.dataset.kind === 'live') visibleCount += 1;
+        });
+
+        const allVisible = graphItems.filter((item) => !item.classList.contains('hidden')).length;
+        emptyState.classList.toggle('hidden', allVisible !== 0);
+        resultCount.textContent = `当前共显示 ${allVisible} 个匹配主题，其中 ${visibleCount} 个为已上线图谱`;
+      }
+
+      filterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          state.filter = button.dataset.filter;
+          filterButtons.forEach((item) => item.classList.toggle('active', item === button));
+          renderFilters();
+        });
+      });
+
+      searchInput.addEventListener('input', (event) => {
+        state.keyword = event.target.value;
+        renderFilters();
+      });
+
+      renderFilters();
+    </script>
   </body>
 </html>
