@@ -156,7 +156,7 @@
       <div class="stats" id="stats"></div>
       <svg id="graph" role="img" aria-label="经济学知识图谱"></svg>
       <div class="legend" id="legend"></div>
-      <div class="hint">操作提示：默认展示经济学发展历史中的主要阶段、学派与人物；滚轮可缩放，拖动画布可平移，拖动节点可调整布局并自动保存到本地。</div>
+      <div class="hint">操作提示：默认展示经济学发展历史中的主要阶段、学派与人物；点击节点会展开该节点全部关联（含间接关联）的知识网络；滚轮可缩放，拖动画布可平移，拖动节点可调整布局并自动保存到本地。</div>
     </section>
 
     <aside class="side">
@@ -430,20 +430,31 @@
       return !getSearchQuery() || text.includes(getSearchQuery());
     }
 
+    function getConnectedNodeIds(id) {
+      if (!id || !adjacency.has(id)) return new Set();
+      const visited = new Set([id]);
+      const queue = [id];
+      while (queue.length) {
+        const current = queue.shift();
+        (adjacency.get(current) || []).forEach(nextId => {
+          if (visited.has(nextId)) return;
+          visited.add(nextId);
+          queue.push(nextId);
+        });
+      }
+      return visited;
+    }
+
     function getVisibleGraphNodeIds() {
+      if (hasSelectionFocus && selected) {
+        const connectedIds = getConnectedNodeIds(selected.id);
+        if (connectedIds.size) return connectedIds;
+      }
       const q = getSearchQuery();
       if (!q) {
-        const baseVisible = new Set(data.nodes
+        return new Set(data.nodes
           .filter(node => filter === 'all' ? DEFAULT_HISTORY_TYPES.has(node.type) : matchesTypeFilter(node))
           .map(node => node.id));
-        if (filter === 'all' && hasSelectionFocus && selected && !baseVisible.has(selected.id)) {
-          baseVisible.add(selected.id);
-          data.links.forEach(link => {
-            if (link.source === selected.id) baseVisible.add(link.target);
-            if (link.target === selected.id) baseVisible.add(link.source);
-          });
-        }
-        return baseVisible;
       }
       const visible = new Set(data.nodes.filter(node => matchesTypeFilter(node) && matchesSearch(node)).map(node => node.id));
       data.links.forEach(link => {
@@ -631,7 +642,7 @@
 
     function renderDetail() {
       if (!selected) {
-        detail.innerHTML = '<h3>发展历史导览</h3><p>默认画布展示经济学发展历史中的主要阶段、学派与人物。点击任一节点后，这里会显示该节点的摘要、直接关联、相关实践参考与可继续浏览的知识线索。</p><div class="detail-section"><div class="detail-section-head"><h4>当前视图说明</h4></div><div class="relations"><div class="relation">默认“全部”视图突出历史脉络：历史阶段 → 学派 → 主要人物。</div><div class="relation">搜索时仅显示命中节点及其直接关联节点，便于快速聚焦。</div><div class="relation">支持滚轮缩放、拖动画布平移、拖动节点调整布局，并自动保存到 localStorage。</div></div></div>';
+        detail.innerHTML = '<h3>发展历史导览</h3><p>默认画布展示经济学发展历史中的主要阶段、学派与人物。点击任一节点后，这里会显示该节点的摘要、直接关联、相关实践参考与可继续浏览的知识线索，同时画布会展开该节点全部关联（含间接关联）的知识网络。</p><div class="detail-section"><div class="detail-section-head"><h4>当前视图说明</h4></div><div class="relations"><div class="relation">默认“全部”视图突出历史脉络：历史阶段 → 学派 → 主要人物。</div><div class="relation">搜索时仅显示命中节点及其直接关联节点，便于快速聚焦。</div><div class="relation">点击节点后会展开该节点的完整关联网络（包含间接关联）。</div><div class="relation">支持滚轮缩放、拖动画布平移、拖动节点调整布局，并自动保存到 localStorage。</div></div></div>';
         return;
       }
       const rel = relationList(selected.id);
@@ -649,7 +660,8 @@
       const visibleNodes = data.nodes.filter(node => visible.has(node.id));
       const labelPlacements = computeLabelPlacements(visibleNodes);
       const shouldFocusSelection = Boolean(selected && hasSelectionFocus && visible.has(selected.id));
-      const nbs = shouldFocusSelection ? neighborIds(selected.id) : visible;
+      const focusIds = shouldFocusSelection ? getConnectedNodeIds(selected.id) : visible;
+      const directIds = shouldFocusSelection ? neighborIds(selected.id) : visible;
       svg.innerHTML = '';
       const viewportGroup = createSvg('g', { transform: getViewportTransform() });
       const background = createSvg('rect', { x: 0, y: 0, width, height, fill: 'transparent', 'data-canvas-bg': 'true' });
@@ -673,14 +685,14 @@
           y1: link.s.y,
           x2: link.t.x,
           y2: link.t.y,
-          class: `link ${shouldFocusSelection && nbs.has(link.source) && nbs.has(link.target) ? 'active' : shouldFocusSelection ? 'dim' : ''}`
+          class: `link ${shouldFocusSelection && directIds.has(link.source) && directIds.has(link.target) ? 'active' : shouldFocusSelection && !(focusIds.has(link.source) && focusIds.has(link.target)) ? 'dim' : ''}`
         });
         line.addEventListener('click', () => select(link.s, { focusGraph: true }));
         gLinks.appendChild(line);
       });
 
       visibleNodes.forEach(node => {
-        const active = !shouldFocusSelection || nbs.has(node.id);
+        const active = !shouldFocusSelection || focusIds.has(node.id);
         const group = createSvg('g', {
           transform: `translate(${node.x},${node.y})`,
           class: `node ${active ? '' : 'dim'}`

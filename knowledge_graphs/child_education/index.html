@@ -279,6 +279,54 @@
         fill: #dfe9ff;
       }
 
+      .domain-section-box {
+        fill: rgba(255, 255, 255, 0.02);
+        stroke: rgba(148, 163, 184, 0.12);
+        stroke-width: 1;
+      }
+
+      .domain-section-title {
+        font-size: 15px;
+        font-weight: 700;
+        fill: #dfe9ff;
+      }
+
+      .domain-section-subtitle {
+        font-size: 11px;
+        fill: #8ea3c5;
+      }
+
+      .hierarchy-guide {
+        stroke: rgba(148, 163, 184, 0.1);
+        stroke-width: 1;
+        stroke-dasharray: 5 6;
+      }
+
+      .hierarchy-column-guide {
+        stroke: rgba(148, 163, 184, 0.08);
+        stroke-width: 1;
+        stroke-dasharray: 4 8;
+      }
+
+      .hierarchy-label {
+        font-size: 11px;
+        fill: #7f93b2;
+      }
+
+      .section-toggle-box {
+        fill: rgba(12, 18, 34, 0.94);
+        stroke: rgba(148, 163, 184, 0.16);
+        stroke-width: 1;
+        cursor: pointer;
+      }
+
+      .section-toggle-label {
+        font-size: 11px;
+        fill: #dfe9ff;
+        cursor: pointer;
+        pointer-events: none;
+      }
+
       .lane-label {
         font-size: 12px;
         fill: #7f93b2;
@@ -287,6 +335,8 @@
       .edge {
         stroke: rgba(148, 163, 184, 0.22);
         stroke-width: 1.2;
+        fill: none;
+        stroke-linecap: round;
         transition: 0.2s ease;
       }
 
@@ -298,6 +348,10 @@
       .edge.preview {
         stroke: rgba(78, 161, 255, 0.86);
         stroke-width: 2;
+      }
+
+      .edge.entering {
+        animation: edgeScopeEnter 0.38s ease;
       }
 
       .node {
@@ -331,6 +385,10 @@
 
       .node.flash circle {
         animation: nodeFlashPulse 0.75s ease 2;
+      }
+
+      .node.entering {
+        animation: nodeScopeEnter 0.42s ease;
       }
 
       .node.fixed circle {
@@ -380,6 +438,16 @@
         0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 207, 123, 0)); }
         50% { transform: scale(1.18); filter: drop-shadow(0 0 14px rgba(255, 207, 123, 0.9)); }
         100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 207, 123, 0)); }
+      }
+
+      @keyframes nodeScopeEnter {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+
+      @keyframes edgeScopeEnter {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
       }
 
       .edge.dimmed {
@@ -912,6 +980,29 @@
         implemented_with_attention_to: '实践时需考虑'
       };
 
+      const RELATION_CURVATURE_PROFILES = {
+        belongs_to: { tier: 0.2, direction: -1 },
+        authored: { tier: 0.25, direction: -1 },
+        documents: { tier: 0.3, direction: -1 },
+        presented: { tier: 0.4, direction: -1 },
+        proposed: { tier: 0.55, direction: 1 },
+        developed: { tier: 0.55, direction: 1 },
+        evidenced: { tier: 0.6, direction: -1 },
+        synthesized: { tier: 0.7, direction: 1 },
+        inspired: { tier: 1.1, direction: 1 },
+        refined: { tier: 1.1, direction: 1 },
+        operationalized_by: { tier: 1.2, direction: -1 },
+        supports: { tier: 1.15, direction: 1 },
+        enables: { tier: 1.15, direction: 1 },
+        reinforced_by: { tier: 1.2, direction: -1 },
+        strengthened_by: { tier: 1.25, direction: -1 },
+        shapes: { tier: 1.35, direction: 1 },
+        supports_foundation_for: { tier: 1.55, direction: -1 },
+        complements: { tier: 1.8, direction: 1 },
+        contextualizes: { tier: 1.95, direction: -1 },
+        implemented_with_attention_to: { tier: 2.2, direction: 1 }
+      };
+
       const GRAPH_WIDTH = 1180;
       const GRAPH_HEIGHT = 760;
       const LAYOUT_STORAGE_KEY = 'awesome_knowledge:child_education:layout:v2';
@@ -941,6 +1032,12 @@
         preventBackgroundClick: false,
         layoutSeed: 0,
         graphScope: 'all',
+        collapsedDomains: new Set(),
+        scopeTransition: {
+          enteringNodeIds: new Set(),
+          enteringEdgeIds: new Set(),
+          timer: null
+        },
         flashNodeId: null,
         flashTimer: null,
         collapsedSections: {
@@ -1055,8 +1152,7 @@
         });
 
         el.neighborSelect.addEventListener('change', (event) => {
-          state.graphScope = event.target.value;
-          renderAll();
+          applyGraphScope(event.target.value);
         });
 
         el.tabs.addEventListener('click', (event) => {
@@ -1216,12 +1312,13 @@
 
       function getGraphScopedData() {
         const baseNodes = getBaseFilteredNodes();
-        const baseNodeIds = new Set(baseNodes.map((node) => node.id));
+        const graphNodes = baseNodes;
+        const baseNodeIds = new Set(graphNodes.map((node) => node.id));
         const baseEdges = getFilteredEdges(baseNodeIds);
         const focusNodeId = getFocusNodeId();
 
         if (!focusNodeId || !baseNodeIds.has(focusNodeId) || state.graphScope === 'all') {
-          return { nodes: baseNodes, edges: baseEdges };
+          return { nodes: graphNodes, edges: baseEdges };
         }
 
         const maxDepth = state.graphScope === 'one-hop' ? 1 : 2;
@@ -1241,9 +1338,63 @@
         }
 
         return {
-          nodes: baseNodes.filter((node) => visibleIds.has(node.id)),
+          nodes: graphNodes.filter((node) => visibleIds.has(node.id)),
           edges: baseEdges.filter((edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target))
         };
+      }
+
+      function applyGraphScope(nextScope) {
+        if (state.graphScope === nextScope) return;
+        const previousScoped = getGraphScopedData();
+        const previousVisibleIds = new Set(previousScoped.nodes.map((node) => node.id));
+        state.graphScope = nextScope;
+        const nextScoped = getGraphScopedData();
+        const nextVisibleIds = new Set(nextScoped.nodes.map((node) => node.id));
+        const focusNodeId = getFocusNodeId();
+
+        nextScoped.nodes.forEach((node, index) => {
+          if (previousVisibleIds.has(node.id) || state.positions.has(node.id)) return;
+          const seedPoint = getScopeTransitionSeed(node.id, nextVisibleIds, focusNodeId, index);
+          if (seedPoint) {
+            state.positions.set(node.id, seedPoint);
+          }
+        });
+
+        primeScopeTransition(previousVisibleIds, nextScoped);
+        renderAll();
+      }
+
+      function getScopeTransitionSeed(nodeId, nextVisibleIds, focusNodeId, index) {
+        const directEdges = state.data.adjacency.get(nodeId) || [];
+        const neighborId = directEdges
+          .map((edge) => edge.source === nodeId ? edge.target : edge.source)
+          .find((candidateId) => nextVisibleIds.has(candidateId) && state.positions.has(candidateId));
+        const anchorId = neighborId || (focusNodeId && state.positions.has(focusNodeId) ? focusNodeId : null);
+        const anchorPoint = anchorId ? state.positions.get(anchorId) : null;
+        if (!anchorPoint) return null;
+        const jitter = getSeededJitter(`${nodeId}-${state.graphScope}-${index}`);
+        return {
+          x: anchorPoint.x + jitter.x * 24,
+          y: anchorPoint.y + jitter.y * 24
+        };
+      }
+
+      function primeScopeTransition(previousVisibleIds, nextScoped) {
+        clearTimeout(state.scopeTransition.timer);
+        state.scopeTransition.enteringNodeIds = new Set(
+          nextScoped.nodes.map((node) => node.id).filter((nodeId) => !previousVisibleIds.has(nodeId))
+        );
+        state.scopeTransition.enteringEdgeIds = new Set(
+          nextScoped.edges
+            .filter((edge) => state.scopeTransition.enteringNodeIds.has(edge.source) || state.scopeTransition.enteringNodeIds.has(edge.target))
+            .map((edge) => edge.id)
+        );
+        state.scopeTransition.timer = setTimeout(() => {
+          state.scopeTransition.enteringNodeIds = new Set();
+          state.scopeTransition.enteringEdgeIds = new Set();
+          state.scopeTransition.timer = null;
+          renderGraph();
+        }, 420);
       }
 
       function renderStats() {
@@ -1277,47 +1428,303 @@
         el.graphLegend.innerHTML = legendItems;
       }
 
+      function getConceptPriorityWeight(node) {
+        if (!node || node.type !== 'concept') return 0;
+        const adjacency = state.data.adjacency.get(node.id) || [];
+        return adjacency.reduce((score, edge) => {
+          const neighbor = edge.direction === 'out' ? edge.targetNode : edge.sourceNode;
+          if (!neighbor) return score;
+          const relationBonus = edge.relation === 'documents'
+            ? 1.2
+            : edge.relation === 'proposed' || edge.relation === 'inspired'
+              ? 0.9
+              : edge.relation === 'supports' || edge.relation === 'complements'
+                ? 0.7
+                : 0.35;
+          const typeBonus = neighbor.type === 'work'
+            ? 4
+            : neighbor.type === 'person'
+              ? 3.2
+              : neighbor.type === 'concept'
+                ? 2.2
+                : 1;
+          return score + typeBonus + relationBonus;
+        }, adjacency.length * 0.85);
+      }
+
+      function sortConceptNodesByWeight(nodes) {
+        return [...nodes].sort((a, b) => {
+          const weightDelta = getConceptPriorityWeight(b) - getConceptPriorityWeight(a);
+          if (Math.abs(weightDelta) > 0.001) return weightDelta;
+          return getNodeDisplayName(a).localeCompare(getNodeDisplayName(b), 'zh-CN');
+        });
+      }
+
       function buildBaseLayout(nodes) {
-        const domains = state.data.metadata.domains;
-        const height = 760;
-        const left = 120;
-        const top = 68;
-        const domainGap = 320;
-        const laneGap = 138;
+        const columns = {
+          domain: 120,
+          person: 360,
+          work: 665,
+          concept: 980
+        };
+        const domainGap = 26;
+        const visibleDomains = state.data.metadata.domains.filter((domain) => nodes.some((node) => {
+          if (node.type === 'domain') return node.name === domain;
+          return node.domain === domain;
+        }));
+        const domainOrder = visibleDomains.length ? visibleDomains : state.data.metadata.domains;
         const positions = new Map();
         const bounds = new Map();
+        const domainBands = new Map();
+        const clusterLinks = [];
+        const clusterGroups = [];
 
-        domains.forEach((domain, domainIndex) => {
-          const xCenter = left + domainIndex * domainGap;
+        const domainWeights = domainOrder.map((domain) => {
+          const total = nodes.filter((node) => (node.type === 'domain' ? node.name === domain : node.domain === domain)).length;
+          return Math.max(1, total + 3);
+        });
+        const totalWeight = domainWeights.reduce((sum, weight) => sum + weight, 0) || 1;
+        const availableHeight = GRAPH_HEIGHT - 120 - domainGap * Math.max(0, domainOrder.length - 1);
+        let currentTop = 72;
 
-          TYPE_ORDER.forEach((type, laneIndex) => {
-            const yLane = top + laneIndex * laneGap;
-            const bucket = nodes.filter((node) => {
-              if (type === 'domain') return node.type === 'domain' && node.name === domain;
-              return node.domain === domain && node.type === type;
+        domainOrder.forEach((domain, domainIndex) => {
+          const sectionHeight = Math.max(150, (availableHeight * domainWeights[domainIndex]) / totalWeight);
+          const sectionTop = currentTop;
+          const sectionBottom = sectionTop + sectionHeight;
+          const centerY = sectionTop + sectionHeight / 2;
+          const domainNode = nodes.find((node) => node.type === 'domain' && node.name === domain);
+
+          domainBands.set(domain, {
+            top: sectionTop,
+            bottom: sectionBottom,
+            center: centerY
+          });
+
+          if (domainNode) {
+            positions.set(domainNode.id, { x: columns.domain, y: centerY });
+            bounds.set(domainNode.id, {
+              minX: columns.domain - 26,
+              maxX: columns.domain + 26,
+              minY: sectionTop + 20,
+              maxY: sectionBottom - 20
             });
+          }
+          const domainNodes = nodes.filter((node) => node.domain === domain);
+          const usableTop = sectionTop + 18;
+          const usableBottom = sectionBottom - 18;
+          const usableHeight = Math.max(72, usableBottom - usableTop);
+          const personNodes = domainNodes.filter((node) => node.type === 'person');
+          const workNodes = domainNodes.filter((node) => node.type === 'work');
+          const conceptNodes = sortConceptNodesByWeight(domainNodes.filter((node) => node.type === 'concept'));
 
-            if (!bucket.length) return;
-            const spacing = Math.min(92, Math.max(52, (height - 140) / Math.max(bucket.length, 1)));
-            const startY = yLane - ((bucket.length - 1) * spacing) / 2;
-            const extraY = Math.max(32, Math.min(96, spacing * 0.8));
-            const xPadding = type === 'domain' ? 46 : 88;
+          const personWorkMap = new Map(personNodes.map((node) => [node.id, []]));
+          const personConceptMap = new Map(personNodes.map((node) => [node.id, []]));
+          const workConceptMap = new Map(workNodes.map((node) => [node.id, []]));
+          const workOwnerMap = new Map();
+          const conceptAnchorMap = new Map();
 
-            bucket.forEach((node, index) => {
-              const x = xCenter + ((index % 2 === 0 ? -1 : 1) * Math.min(42, Math.floor(index / 2) * 14));
-              const y = startY + index * spacing;
-              positions.set(node.id, { x, y });
-              bounds.set(node.id, {
-                minX: xCenter - xPadding,
-                maxX: xCenter + xPadding,
-                minY: startY - extraY,
-                maxY: startY + ((bucket.length - 1) * spacing) + extraY
+          workNodes.forEach((work) => {
+            const owner = (state.data.adjacency.get(work.id) || [])
+              .filter((edge) => edge.direction === 'in' && edge.sourceNode?.type === 'person' && ['authored', 'presented'].includes(edge.relation))
+              .map((edge) => edge.sourceNode)
+              .find(Boolean);
+            if (owner) {
+              workOwnerMap.set(work.id, owner.id);
+              personWorkMap.get(owner.id)?.push(work);
+              clusterLinks.push({
+                source: owner.id,
+                target: work.id,
+                strength: 0.05,
+                xTension: 0.22,
+                yTension: 1
+              });
+            }
+          });
+
+          conceptNodes.forEach((concept) => {
+            const conceptEdges = state.data.adjacency.get(concept.id) || [];
+            const workAnchor = conceptEdges
+              .filter((edge) => edge.direction === 'in' && edge.sourceNode?.type === 'work' && edge.relation === 'documents')
+              .map((edge) => edge.sourceNode)
+              .find(Boolean);
+            if (workAnchor) {
+              conceptAnchorMap.set(concept.id, { type: 'work', id: workAnchor.id });
+              workConceptMap.get(workAnchor.id)?.push(concept);
+              clusterLinks.push({
+                source: workAnchor.id,
+                target: concept.id,
+                strength: 0.075,
+                xTension: 0.3,
+                yTension: 1.35
+              });
+              return;
+            }
+            const personAnchor = conceptEdges
+              .filter((edge) => edge.direction === 'in' && edge.sourceNode?.type === 'person')
+              .map((edge) => edge.sourceNode)
+              .find(Boolean);
+            if (personAnchor) {
+              conceptAnchorMap.set(concept.id, { type: 'person', id: personAnchor.id });
+              personConceptMap.get(personAnchor.id)?.push(concept);
+              clusterLinks.push({
+                source: personAnchor.id,
+                target: concept.id,
+                strength: 0.062,
+                xTension: 0.24,
+                yTension: 1.15
+              });
+            }
+          });
+
+          personWorkMap.forEach((works, personId) => {
+            if (!works.length) return;
+            clusterGroups.push({
+              anchorId: personId,
+              memberIds: works.map((work) => work.id),
+              strength: 0.022
+            });
+          });
+          personConceptMap.forEach((concepts, personId) => {
+            if (!concepts.length) return;
+            clusterGroups.push({
+              anchorId: personId,
+              memberIds: concepts.map((concept) => concept.id),
+              strength: 0.032
+            });
+          });
+          workConceptMap.forEach((concepts, workId) => {
+            if (!concepts.length) return;
+            clusterGroups.push({
+              anchorId: workId,
+              memberIds: concepts.map((concept) => concept.id),
+              strength: 0.04
+            });
+          });
+
+          const personOrder = [...personNodes].sort((a, b) => {
+            const scoreA = (personWorkMap.get(a.id)?.length || 0) * 3 + (personConceptMap.get(a.id)?.length || 0);
+            const scoreB = (personWorkMap.get(b.id)?.length || 0) * 3 + (personConceptMap.get(b.id)?.length || 0);
+            if (scoreA !== scoreB) return scoreB - scoreA;
+            return getNodeDisplayName(a).localeCompare(getNodeDisplayName(b), 'zh-CN');
+          });
+
+          const personSpacing = Math.min(72, Math.max(36, usableHeight / Math.max(personOrder.length, 1)));
+          const personStartY = usableTop + (usableHeight - (personOrder.length - 1) * personSpacing) / 2;
+          const personYMap = new Map();
+
+          personOrder.forEach((person, index) => {
+            const y = personStartY + index * personSpacing;
+            personYMap.set(person.id, y);
+            positions.set(person.id, { x: columns.person, y });
+            bounds.set(person.id, {
+              minX: columns.person - 48,
+              maxX: columns.person + 48,
+              minY: usableTop - 16,
+              maxY: usableBottom + 16
+            });
+          });
+
+          const remainingWorks = [];
+          workNodes.forEach((work) => {
+            const ownerId = workOwnerMap.get(work.id);
+            if (!ownerId || !personYMap.has(ownerId)) {
+              remainingWorks.push(work);
+              return;
+            }
+            const siblings = personWorkMap.get(ownerId) || [];
+            const localIndex = siblings.findIndex((item) => item.id === work.id);
+            const offset = (localIndex - (siblings.length - 1) / 2) * 18;
+            const y = clampNumber(personYMap.get(ownerId) + offset, usableTop, usableBottom);
+            positions.set(work.id, { x: columns.work, y });
+            bounds.set(work.id, {
+              minX: columns.work - 54,
+              maxX: columns.work + 54,
+              minY: usableTop - 14,
+              maxY: usableBottom + 14
+            });
+          });
+
+          if (remainingWorks.length) {
+            const workSpacing = Math.min(40, Math.max(24, usableHeight / Math.max(remainingWorks.length, 1)));
+            const workStartY = usableTop + (usableHeight - (remainingWorks.length - 1) * workSpacing) / 2;
+            remainingWorks.forEach((work, index) => {
+              const y = workStartY + index * workSpacing;
+              positions.set(work.id, { x: columns.work, y });
+              bounds.set(work.id, {
+                minX: columns.work - 54,
+                maxX: columns.work + 54,
+                minY: usableTop - 14,
+                maxY: usableBottom + 14
+              });
+            });
+          }
+
+          const remainingConcepts = [];
+          conceptNodes.forEach((concept) => {
+            const anchor = conceptAnchorMap.get(concept.id);
+            if (!anchor) {
+              remainingConcepts.push(concept);
+              return;
+            }
+            const siblingGroup = anchor.type === 'work'
+              ? (workConceptMap.get(anchor.id) || [])
+              : (personConceptMap.get(anchor.id) || []);
+            const anchorPoint = positions.get(anchor.id);
+            if (!anchorPoint) {
+              remainingConcepts.push(concept);
+              return;
+            }
+            const localIndex = siblingGroup.findIndex((item) => item.id === concept.id);
+            const offset = (localIndex - (siblingGroup.length - 1) / 2) * 16;
+            const y = clampNumber(anchorPoint.y + offset, usableTop, usableBottom);
+            positions.set(concept.id, { x: columns.concept, y });
+            bounds.set(concept.id, {
+              minX: columns.concept - 70,
+              maxX: columns.concept + 70,
+              minY: usableTop - 12,
+              maxY: usableBottom + 12
+            });
+          });
+
+          if (remainingConcepts.length) {
+            const conceptSpacing = Math.min(34, Math.max(20, usableHeight / Math.max(remainingConcepts.length, 1)));
+            const conceptStartY = usableTop + (usableHeight - (remainingConcepts.length - 1) * conceptSpacing) / 2;
+            remainingConcepts.forEach((concept, index) => {
+              const y = conceptStartY + index * conceptSpacing;
+              positions.set(concept.id, { x: columns.concept, y });
+              bounds.set(concept.id, {
+                minX: columns.concept - 70,
+                maxX: columns.concept + 70,
+                minY: usableTop - 12,
+                maxY: usableBottom + 12
+              });
+            });
+          }
+
+          [workNodes, conceptNodes].forEach((bucket, bucketIndex) => {
+            const type = bucketIndex === 0 ? 'work' : 'concept';
+            const xCenter = columns[type];
+            bucket.forEach((node) => {
+              const adjacency = state.data.adjacency.get(node.id) || [];
+              const neighborPoints = adjacency
+                .map((edge) => edge.direction === 'out' ? edge.targetNode : edge.sourceNode)
+                .filter(Boolean)
+                .filter((neighbor) => positions.has(neighbor.id))
+                .map((neighbor) => positions.get(neighbor.id));
+              if (!neighborPoints.length || !positions.has(node.id)) return;
+              const avgY = neighborPoints.reduce((sum, point) => sum + point.y, 0) / neighborPoints.length;
+              const current = positions.get(node.id);
+              positions.set(node.id, {
+                x: xCenter,
+                y: clampNumber(current.y * 0.45 + avgY * 0.55, usableTop, usableBottom)
               });
             });
           });
+
+          currentTop = sectionBottom + domainGap;
         });
 
-        return { positions, bounds };
+        return { positions, bounds, columns, domainBands, clusterLinks, clusterGroups };
       }
 
       function ensureValidNodeState(nodeIds) {
@@ -1345,6 +1752,7 @@
           type: node.type,
           locked: state.fixedNodes.has(node.id) || state.dragging?.nodeId === node.id
         }));
+        const nodeMetaMap = new Map(nodeList.map((node) => [node.id, node]));
 
         for (let iteration = 0; iteration < 18; iteration += 1) {
           const deltas = new Map(nodeList.map((node) => [node.id, { x: 0, y: 0 }]));
@@ -1368,14 +1776,58 @@
             const pull = (distance - desired) * 0.025;
             const fx = (dx / distance) * pull;
             const fy = (dy / distance) * pull;
-            if (!nodeList.find((node) => node.id === edge.source)?.locked) {
+            if (!nodeMetaMap.get(edge.source)?.locked) {
               deltas.get(edge.source).x += fx;
               deltas.get(edge.source).y += fy;
             }
-            if (!nodeList.find((node) => node.id === edge.target)?.locked) {
+            if (!nodeMetaMap.get(edge.target)?.locked) {
               deltas.get(edge.target).x -= fx;
               deltas.get(edge.target).y -= fy;
             }
+          });
+
+          (baseLayout.clusterLinks || []).forEach((link) => {
+            const source = working.get(link.source);
+            const target = working.get(link.target);
+            const sourceBase = baseLayout.positions.get(link.source);
+            const targetBase = baseLayout.positions.get(link.target);
+            if (!source || !target || !sourceBase || !targetBase) return;
+
+            const sourceLocked = nodeMetaMap.get(link.source)?.locked;
+            const targetLocked = nodeMetaMap.get(link.target)?.locked;
+            const dx = target.x - source.x;
+            const dy = target.y - source.y;
+            const desiredX = targetBase.x - sourceBase.x;
+            const shiftX = (dx - desiredX) * link.strength * (link.xTension || 0.2);
+            const shiftY = dy * link.strength * (link.yTension || 1);
+
+            if (!sourceLocked) {
+              deltas.get(link.source).x += shiftX * 0.18;
+              deltas.get(link.source).y += shiftY * 0.25;
+            }
+            if (!targetLocked) {
+              deltas.get(link.target).x -= shiftX * 0.82;
+              deltas.get(link.target).y -= shiftY * 0.75;
+            }
+          });
+
+          (baseLayout.clusterGroups || []).forEach((group) => {
+            const anchor = working.get(group.anchorId);
+            if (!anchor) return;
+            const members = group.memberIds
+              .map((memberId) => ({
+                id: memberId,
+                point: working.get(memberId),
+                locked: nodeMetaMap.get(memberId)?.locked
+              }))
+              .filter((member) => member.point);
+            if (!members.length) return;
+            const centroidY = members.reduce((sum, member) => sum + member.point.y, 0) / members.length;
+            const shiftY = (anchor.y - centroidY) * group.strength;
+            members.forEach((member) => {
+              if (member.locked) return;
+              deltas.get(member.id).y += shiftY;
+            });
           });
 
           for (let i = 0; i < nodeList.length; i += 1) {
@@ -1510,6 +1962,7 @@
               y: Number(point.y.toFixed(2))
             }])),
             fixedNodes: [...state.fixedNodes],
+            collapsedDomains: [...state.collapsedDomains],
             viewport: {
               scale: Number(state.viewport.scale.toFixed(3)),
               tx: Number(state.viewport.tx.toFixed(2)),
@@ -1534,6 +1987,9 @@
           }
           if (Array.isArray(payload.fixedNodes)) {
             state.fixedNodes = new Set(payload.fixedNodes);
+          }
+          if (Array.isArray(payload.collapsedDomains)) {
+            state.collapsedDomains = new Set(payload.collapsedDomains);
           }
           if (payload.viewport) {
             state.viewport.scale = clampNumber(Number(payload.viewport.scale) || 1, 0.65, 2.5);
@@ -1619,23 +2075,47 @@
         viewportGroup.appendChild(background);
         svg.appendChild(viewportGroup);
 
-        state.data.metadata.domains.forEach((domain, domainIndex) => {
-          const xCenter = 120 + domainIndex * 320;
-          const domainLabel = createSvg('text', {
-            x: xCenter,
-            y: 36,
-            class: 'domain-label',
+        const headerY = 36;
+        [['domain', '学科'], ['person', '人物'], ['work', '作品'], ['concept', '观点/概念']].forEach(([type, label], index, list) => {
+          const x = baseLayout.columns[type];
+          const labelText = createSvg('text', {
+            x,
+            y: headerY,
+            class: 'hierarchy-label',
             'text-anchor': 'middle'
+          }, label);
+          viewportGroup.appendChild(labelText);
+
+          const columnGuide = createSvg('line', {
+            x1: x,
+            y1: headerY + 12,
+            x2: x,
+            y2: GRAPH_HEIGHT - 28,
+            class: 'hierarchy-column-guide'
+          });
+          viewportGroup.appendChild(columnGuide);
+
+          if (index < list.length - 1) {
+            const nextType = list[index + 1][0];
+            const nextX = baseLayout.columns[nextType];
+            const guide = createSvg('line', {
+              x1: x + 34,
+              y1: headerY - 4,
+              x2: nextX - 34,
+              y2: headerY - 4,
+              class: 'hierarchy-guide'
+            });
+            viewportGroup.appendChild(guide);
+          }
+        });
+
+        baseLayout.domainBands.forEach((band, domain) => {
+          const domainLabel = createSvg('text', {
+            x: 42,
+            y: band.top + 18,
+            class: 'domain-section-subtitle'
           }, domain);
           viewportGroup.appendChild(domainLabel);
-
-          TYPE_ORDER.forEach((type, laneIndex) => {
-            const yLane = 68 + laneIndex * 138;
-            const laneText = domainIndex === 0
-              ? createSvg('text', { x: 20, y: yLane + 4, class: 'lane-label' }, TYPE_LABELS[type])
-              : null;
-            if (laneText) viewportGroup.appendChild(laneText);
-          });
         });
 
         const selectedNeighbors = new Set();
@@ -1650,28 +2130,25 @@
           const source = state.positions.get(edge.source);
           const target = state.positions.get(edge.target);
           if (!source || !target) return;
-          const line = createSvg('line', {
-            x1: source.x,
-            y1: source.y,
-            x2: target.x,
-            y2: target.y,
-            class: `edge ${isEdgeActive(edge) ? 'active' : ''} ${state.hoverNodeId && !state.selectedNodeId && isEdgeActive(edge) ? 'preview' : ''} ${isGraphDimmed(edge) ? 'dimmed' : ''}`
+          const path = createSvg('path', {
+            d: buildEdgePath(edge, source, target),
+            class: `edge ${state.scopeTransition.enteringEdgeIds.has(edge.id) ? 'entering' : ''} ${isEdgeActive(edge) ? 'active' : ''} ${state.hoverNodeId && !state.selectedNodeId && isEdgeActive(edge) ? 'preview' : ''} ${isGraphDimmed(edge) ? 'dimmed' : ''}`
           });
-          line.addEventListener('click', () => {
+          path.addEventListener('click', () => {
             state.selectedNodeId = edge.source;
             state.selectedStage = null;
             state.selectedPracticeId = null;
             renderAll();
             centerViewportOnNode(edge.source, { flash: true });
           });
-          viewportGroup.appendChild(line);
+          viewportGroup.appendChild(path);
         });
 
         nodes.forEach((node) => {
           const pos = state.positions.get(node.id);
           if (!pos) return;
           const g = createSvg('g', {
-            class: `node ${focusNodeId === node.id ? 'active' : ''} ${state.flashNodeId === node.id ? 'flash' : ''} ${state.fixedNodes.has(node.id) ? 'fixed' : ''} ${isNodeDimmed(node.id, selectedNeighbors) ? 'dimmed' : ''}`,
+            class: `node ${state.scopeTransition.enteringNodeIds.has(node.id) ? 'entering' : ''} ${focusNodeId === node.id ? 'active' : ''} ${state.flashNodeId === node.id ? 'flash' : ''} ${state.fixedNodes.has(node.id) ? 'fixed' : ''} ${isNodeDimmed(node.id, selectedNeighbors) ? 'dimmed' : ''}`,
             transform: `translate(${pos.x}, ${pos.y})`
           });
           const radius = getNodeRadius(node.type);
@@ -1708,6 +2185,11 @@
           });
           g.addEventListener('pointermove', (event) => {
             showTooltip(node.id, event);
+          });
+          g.addEventListener('dblclick', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleFixedNode(node.id, { ensureSelected: true, flash: true });
           });
           g.addEventListener('pointerleave', () => {
             hideTooltip();
@@ -2148,6 +2630,48 @@
         return { x, y };
       }
 
+      function getEdgeCurvatureProfile(edge) {
+        return RELATION_CURVATURE_PROFILES[edge?.relation] || { tier: 1, direction: 1 };
+      }
+
+      function getEdgeCurveDirection(edge) {
+        const profile = getEdgeCurvatureProfile(edge);
+        if (typeof profile.direction === 'number' && profile.direction !== 0) {
+          return profile.direction > 0 ? 1 : -1;
+        }
+        const seedText = `${edge?.relation || ''}:${edge?.source || ''}:${edge?.target || ''}`;
+        const hash = Array.from(seedText).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+        return hash % 2 === 0 ? 1 : -1;
+      }
+
+      function buildEdgePath(edge, source, target) {
+        const profile = getEdgeCurvatureProfile(edge);
+        const tier = profile.tier || 0;
+        const direction = getEdgeCurveDirection(edge);
+        const dx = target.x - source.x;
+        const dy = target.y - source.y;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+        const horizontalDirection = dx >= 0 ? 1 : -1;
+
+        if (absDx < 6) {
+          const bend = clampNumber(34 + absDy * 0.28 + tier * 18, 34, 132);
+          const xOffset = bend * direction;
+          const yControlOffset = clampNumber(10 + tier * 8, 10, 32) * (dy >= 0 ? 1 : -1);
+          return `M ${source.x} ${source.y} C ${source.x + xOffset} ${source.y + yControlOffset * 0.2} ${target.x + xOffset} ${target.y - yControlOffset} ${target.x} ${target.y}`;
+        }
+
+        const curveX = clampNumber(absDx * (0.24 + tier * 0.028) + 30, 40, 154);
+        const relationLift = clampNumber(10 + absDx * 0.035 + tier * 18 + Math.min(absDy * 0.08, 14), 12, 92) * direction;
+        const driftY = clampNumber(dy * (0.1 + tier * 0.015), -42, 42);
+        const sourceControlX = source.x + horizontalDirection * curveX;
+        const targetControlX = target.x - horizontalDirection * curveX;
+        const sourceControlY = source.y + driftY + relationLift;
+        const targetControlY = target.y - driftY * 0.65 + relationLift * 0.88;
+
+        return `M ${source.x} ${source.y} C ${sourceControlX} ${sourceControlY} ${targetControlX} ${targetControlY} ${target.x} ${target.y}`;
+      }
+
       function bindDetailNodeLinks() {
         el.detailContent.querySelectorAll('[data-detail-node], [data-focus-node]').forEach((item) => {
           item.addEventListener('click', () => {
@@ -2195,11 +2719,35 @@
       function toggleFixedSelectedNode() {
         const nodeId = state.selectedNodeId;
         if (!nodeId) return;
+        toggleFixedNode(nodeId, { ensureSelected: true });
+      }
+
+      function toggleDomainSection(domain) {
+        if (state.collapsedDomains.has(domain)) {
+          state.collapsedDomains.delete(domain);
+        } else {
+          state.collapsedDomains.add(domain);
+        }
+        schedulePersistLayout();
+        renderAll();
+      }
+
+      function toggleFixedNode(nodeId, { ensureSelected = false, flash = false } = {}) {
+        if (!nodeId) return;
         if (state.fixedNodes.has(nodeId)) {
           state.fixedNodes.delete(nodeId);
         } else {
           state.fixedNodes.add(nodeId);
         }
+        if (ensureSelected) {
+          state.selectedNodeId = nodeId;
+          state.selectedStage = null;
+          state.selectedPracticeId = null;
+        }
+        if (flash) {
+          flashNode(nodeId);
+        }
+        schedulePersistLayout();
         renderAll();
       }
 
