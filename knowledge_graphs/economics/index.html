@@ -92,8 +92,20 @@
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 12px; }
     .detail h3 { margin: 12px 0 8px; font-size: 24px; }
     .detail p { color: #cbd5e1; line-height: 1.75; }
+    .detail-section { margin-top: 18px; }
+    .detail-section-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .detail-section-head h4 { margin: 0; font-size: 18px; }
+    .section-tip { color: var(--muted); font-size: 13px; line-height: 1.65; }
     .relations { display: grid; gap: 8px; margin-top: 14px; }
     .relation { padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); color: #cbd5e1; font-size: 13px; }
+    .practice-inline-list { display: grid; gap: 10px; margin-top: 12px; }
+    .practice-inline-card { padding: 14px; border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 16px; background: rgba(14, 165, 233, 0.08); cursor: pointer; transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+    .practice-inline-card:hover, .practice-inline-card.active { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.75); background: rgba(56, 189, 248, 0.16); }
+    .practice-kicker { color: #7dd3fc; font-size: 12px; font-weight: 700; letter-spacing: .01em; }
+    .practice-meta { margin-top: 8px; color: #93c5fd; font-size: 12px; }
+    .practice-guide-card { padding: 14px; border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 18px; background: linear-gradient(180deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.94)); }
+    .practice-guide-list { margin: 10px 0 0 18px; padding: 0; color: #cbd5e1; line-height: 1.7; }
+    .practice-guide-list li + li { margin-top: 6px; }
     .timeline { padding: 8px 20px 20px; max-height: 470px; overflow: auto; }
     .event { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
     .event:hover .event-title { color: var(--accent); }
@@ -102,6 +114,11 @@
     .event-summary { color: var(--muted); margin-top: 5px; line-height: 1.55; font-size: 13px; }
     .matrix { padding: 12px 20px 20px; display: grid; gap: 10px; }
     .pill { padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); color: #cbd5e1; line-height: 1.55; font-size: 13px; }
+    .practice-list { padding: 12px 20px 20px; display: grid; gap: 10px; }
+    .practice-card { padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); cursor: pointer; transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+    .practice-card.active, .practice-card:hover { transform: translateY(-1px); border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+    .practice-title { font-weight: 700; }
+    .practice-tag { color: var(--accent); font-size: 12px; margin-bottom: 6px; }
     .stats { position: absolute; right: 16px; top: 16px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
     .stat { background: rgba(2,6,23,.68); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; color: var(--muted); font-size: 12px; }
     .hint { padding: 0 20px 18px; color: var(--muted); font-size: 13px; line-height: 1.6; }
@@ -155,6 +172,10 @@
         <h2>关键关联地图</h2>
         <div class="matrix" id="matrix"></div>
       </section>
+      <section class="card">
+        <h2>实践参考与日常运用</h2>
+        <div class="practice-list" id="practiceList"></div>
+      </section>
     </aside>
   </main>
 
@@ -166,8 +187,10 @@
     const detail = document.getElementById('detail');
     const timelineEl = document.getElementById('timeline');
     const matrix = document.getElementById('matrix');
+    const practiceList = document.getElementById('practiceList');
     const search = document.getElementById('search');
     let selected = null;
+    let selectedPracticeId = null;
     let filter = 'all';
     let width = 900, height = 660, dragging = null, didDrag = false;
     let nodeById = new Map();
@@ -207,6 +230,13 @@
         return { relation: l.relation, other };
       });
     }
+    function getFilteredPractices() {
+      const q = search.value.trim().toLowerCase();
+      return (data.practical_guides || []).filter(guide => {
+        const text = [guide.title, guide.scenario, guide.habit, guide.daily_use, ...(guide.steps || [])].filter(Boolean).join(' ').toLowerCase();
+        return !q || text.includes(q);
+      });
+    }
     function renderStatic() {
       document.getElementById('legend').innerHTML = Object.entries(data.categories).map(([k,v]) => `<span><i class="dot" style="background:${colors[k]}"></i>${v}</span>`).join('');
       const counts = Object.keys(data.categories).map(k => `${data.categories[k]} ${data.nodes.filter(n => n.type === k).length}`);
@@ -221,10 +251,43 @@
         ['博弈 → 机制设计','策略互动、激励相容和制度设计连接市场、组织与公共政策。']
       ].map(([a,b]) => `<div class="pill"><strong>${a}</strong><br>${b}</div>`).join('');
     }
+    function renderPracticeList() {
+      const guides = getFilteredPractices().slice().sort((a, b) => {
+        const aRelated = (a.related_nodes || []).includes(selected?.id) ? 1 : 0;
+        const bRelated = (b.related_nodes || []).includes(selected?.id) ? 1 : 0;
+        if (aRelated !== bRelated) return bRelated - aRelated;
+        return a.title.localeCompare(b.title, 'zh-CN');
+      });
+      if (!selectedPracticeId || !guides.some(g => g.id === selectedPracticeId)) {
+        selectedPracticeId = guides[0]?.id || null;
+      }
+      if (!guides.length) {
+        practiceList.innerHTML = '<div class="pill">当前搜索条件下没有可显示的实践建议。</div>';
+        return;
+      }
+      practiceList.innerHTML = guides.map(guide => {
+        const related = (guide.related_nodes || []).includes(selected?.id);
+        return `<div class="practice-card ${selectedPracticeId === guide.id ? 'active' : ''}" data-practice="${guide.id}">
+          <div class="practice-tag">${related ? '与当前节点强关联' : '实践参考'}</div>
+          <div class="practice-title">${guide.title}</div>
+          <div class="event-summary" style="margin-top:8px;">${guide.habit}</div>
+          ${related ? `<div class="practice-meta">点击后可在上方“节点详情”中展开完整操作指南</div>` : ''}
+        </div>`;
+      }).join('');
+      practiceList.querySelectorAll('[data-practice]').forEach(el => el.addEventListener('click', () => {
+        selectedPracticeId = el.dataset.practice;
+        renderPracticeList();
+        renderDetail();
+      }));
+    }
     function renderDetail() {
       const rel = relationList(selected.id);
-      detail.innerHTML = `<span class="badge"><i class="dot" style="background:${colors[selected.type] || '#94a3b8'}"></i>${data.categories[selected.type] || selected.type}${selected.period ? ' · ' + selected.period : ''}</span><h3>${selected.name}</h3><p>${selected.summary || '暂无摘要'}</p><div class="relations">${rel.length ? rel.map(r => `<div class="relation" data-node="${r.other.id}"><strong>${r.relation}</strong> → ${r.other.name} <span style="color:#94a3b8">(${data.categories[r.other.type] || r.other.type})</span></div>`).join('') : '<div class="relation">暂无关联</div>'}</div>`;
+      const relatedGuides = (data.practical_guides || []).filter(guide => (guide.related_nodes || []).includes(selected.id));
+      const activeGuide = (data.practical_guides || []).find(guide => guide.id === selectedPracticeId);
+      const displayGuide = relatedGuides.find(guide => guide.id === selectedPracticeId) || relatedGuides[0] || activeGuide;
+      detail.innerHTML = `<span class="badge"><i class="dot" style="background:${colors[selected.type] || '#94a3b8'}"></i>${data.categories[selected.type] || selected.type}${selected.period ? ' · ' + selected.period : ''}</span><h3>${selected.name}</h3><p>${selected.summary || '暂无摘要'}</p>${relatedGuides.length ? `<div class="detail-section"><div class="detail-section-head"><h4>现实生活实践参考</h4><span class="badge">关联 ${relatedGuides.length} 条</span></div><div class="section-tip">这些建议与当前节点直接相关。点击卡片即可在右侧展开对应的小习惯、操作步骤和日常用法。</div><div class="practice-inline-list">${relatedGuides.map(guide => `<div class="practice-inline-card ${displayGuide?.id === guide.id ? 'active' : ''}" data-practice="${guide.id}"><div class="practice-kicker">实践参考</div><strong style="display:block;margin-top:6px;">${guide.title}</strong><div class="event-summary" style="margin-top:8px;">${guide.habit}</div><div class="practice-meta">适用场景：${guide.scenario}</div></div>`).join('')}</div></div>` : ''}<div class="detail-section"><div class="detail-section-head"><h4>直接关联</h4><span class="section-tip">点击条目可继续沿关系浏览</span></div><div class="relations">${rel.length ? rel.map(r => `<div class="relation" data-node="${r.other.id}"><strong>${r.relation}</strong> → ${r.other.name} <span style="color:#94a3b8">(${data.categories[r.other.type] || r.other.type})</span></div>`).join('') : '<div class="relation">暂无关联</div>'}</div></div>${displayGuide ? `<div class="detail-section"><div class="detail-section-head"><h4>${relatedGuides.length ? '当前展开的实践指南' : '当前选中的实践参考'}</h4><span class="section-tip">${displayGuide.scenario}</span></div><div class="practice-guide-card"><strong>${displayGuide.title}</strong><div style="margin-top:6px;color:#94a3b8;">适用场景：${displayGuide.scenario}</div><div style="margin-top:10px;">小习惯：${displayGuide.habit}</div><ol class="practice-guide-list">${(displayGuide.steps || []).map(step => `<li>${step}</li>`).join('')}</ol><div style="margin-top:10px;color:#94a3b8;">日常运用：${displayGuide.daily_use}</div></div></div>` : ''}`;
       detail.querySelectorAll('[data-node]').forEach(el => el.addEventListener('click', () => select(nodeById.get(el.dataset.node))));
+      detail.querySelectorAll('[data-practice]').forEach(el => el.addEventListener('click', () => { selectedPracticeId = el.dataset.practice; renderPracticeList(); renderDetail(); }));
     }
     function renderGraph() {
       const visible = new Set(data.nodes.filter(matches).map(n => n.id));
@@ -280,23 +343,23 @@
       });
       renderGraph(); requestAnimationFrame(tick);
     }
-    function select(n) { if (!n) return; selected = n; renderDetail(); renderGraph(); }
+    function select(n) { if (!n) return; selected = n; const related = (data.practical_guides || []).find(guide => (guide.related_nodes || []).includes(n.id)); if (related) selectedPracticeId = related.id; renderDetail(); renderPracticeList(); renderGraph(); }
     svg.addEventListener('pointermove', e => { if (!dragging) return; const r = svg.getBoundingClientRect(); dragging.fx = (e.clientX - r.left) * width / r.width; dragging.fy = (e.clientY - r.top) * height / r.height; dragging.vx = dragging.vy = 0; didDrag = true; });
     svg.addEventListener('pointerup', e => { if (dragging) { dragging.x = dragging.fx; dragging.y = dragging.fy; dragging.fx = dragging.fy = null; try { svg.releasePointerCapture(e.pointerId); } catch (_) {} } setTimeout(() => { didDrag = false; }, 0); dragging = null; });
     svg.addEventListener('pointercancel', () => { dragging = null; didDrag = false; });
-    search.addEventListener('input', renderGraph);
+    search.addEventListener('input', () => { renderGraph(); renderPracticeList(); renderDetail(); });
     document.getElementById('toolbar').addEventListener('click', e => {
       if (e.target.tagName !== 'BUTTON') return;
       filter = e.target.dataset.filter;
       document.querySelectorAll('#toolbar button').forEach(b => b.classList.toggle('active', b === e.target));
-      renderGraph();
+      renderGraph(); renderPracticeList(); renderDetail();
     });
     async function boot() {
       try {
         const response = await fetch('./graph.json');
         if (!response.ok) throw new Error('graph.json 加载失败');
         initData(await response.json());
-        renderStatic(); renderDetail(); tick();
+        renderStatic(); renderPracticeList(); renderDetail(); tick();
       } catch (error) {
         document.body.innerHTML = `<div style="padding:32px;color:#fff;font-family:sans-serif;line-height:1.8;">页面加载失败：${error.message}<br>请通过本地静态服务器或 GitHub Pages 打开页面。</div>`;
       }

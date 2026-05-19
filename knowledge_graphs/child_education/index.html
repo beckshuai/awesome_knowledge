@@ -105,7 +105,7 @@
       .controls {
         margin-top: 18px;
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
         gap: 12px;
       }
 
@@ -130,6 +130,32 @@
         padding: 12px 14px;
         font-size: 14px;
         outline: none;
+      }
+
+      .search-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .search-row input {
+        flex: 1;
+      }
+
+      .search-action-btn {
+        flex-shrink: 0;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        background: rgba(12, 18, 34, 0.95);
+        color: var(--text);
+        padding: 12px 14px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .search-action-btn:hover {
+        border-color: rgba(78, 161, 255, 0.42);
+        background: rgba(78, 161, 255, 0.14);
       }
 
       .tabs {
@@ -174,6 +200,13 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 12px;
+        gap: 12px;
+      }
+
+      .panel-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .panel-title h2,
@@ -185,6 +218,41 @@
       .panel-title span {
         color: var(--muted);
         font-size: 12px;
+      }
+
+      .graph-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .panel-btn,
+      .section-toggle-btn {
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        background: rgba(12, 18, 34, 0.9);
+        color: var(--text);
+        padding: 8px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .panel-btn:hover,
+      .section-toggle-btn:hover {
+        border-color: rgba(78, 161, 255, 0.45);
+        background: rgba(78, 161, 255, 0.14);
+      }
+
+      .panel-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+      }
+
+      .graph-stage {
+        position: relative;
       }
 
       .view {
@@ -227,6 +295,11 @@
         stroke-width: 2.6;
       }
 
+      .edge.preview {
+        stroke: rgba(78, 161, 255, 0.86);
+        stroke-width: 2;
+      }
+
       .node {
         cursor: grab;
         transition: 0.2s ease;
@@ -238,6 +311,10 @@
 
       .node circle {
         transition: 0.2s ease;
+      }
+
+      .node:hover circle {
+        filter: brightness(1.08);
       }
 
       .node text {
@@ -252,8 +329,57 @@
         stroke-width: 3;
       }
 
+      .node.flash circle {
+        animation: nodeFlashPulse 0.75s ease 2;
+      }
+
+      .node.fixed circle {
+        stroke-dasharray: 5 4;
+        stroke-width: 3.4;
+        filter: drop-shadow(0 0 10px rgba(78, 161, 255, 0.34));
+      }
+
       .node.dimmed {
         opacity: 0.28;
+      }
+
+      .graph-tooltip {
+        position: absolute;
+        min-width: 180px;
+        max-width: 280px;
+        padding: 10px 12px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 14px;
+        background: rgba(8, 13, 24, 0.96);
+        color: var(--text);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.36);
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(0, 0);
+        transition: opacity 0.16s ease;
+        z-index: 3;
+      }
+
+      .graph-tooltip.visible {
+        opacity: 1;
+      }
+
+      .graph-tooltip strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .graph-tooltip p {
+        margin: 6px 0 0;
+        color: #bfd0ee;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      @keyframes nodeFlashPulse {
+        0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 207, 123, 0)); }
+        50% { transform: scale(1.18); filter: drop-shadow(0 0 14px rgba(255, 207, 123, 0.9)); }
+        100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 207, 123, 0)); }
       }
 
       .edge.dimmed {
@@ -291,6 +417,107 @@
 
       .track-card {
         padding: 18px;
+      }
+
+      .practice-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .practice-card {
+        padding: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 16px;
+        background: rgba(12, 18, 34, 0.78);
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .practice-card:hover,
+      .practice-card.active {
+        transform: translateY(-2px);
+        border-color: rgba(78, 161, 255, 0.48);
+        background: rgba(78, 161, 255, 0.12);
+      }
+
+      .practice-domain {
+        color: var(--orange);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .practice-title {
+        margin-top: 8px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .practice-summary {
+        margin-top: 8px;
+        color: #bfd0ee;
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .practice-steps {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #bfd0ee;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .practice-steps li + li {
+        margin-top: 6px;
+      }
+
+      .practice-inline-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .practice-inline-card {
+        cursor: pointer;
+        transition: 0.2s ease;
+        border-color: rgba(255, 180, 84, 0.18);
+        background: linear-gradient(180deg, rgba(24, 34, 62, 0.92), rgba(12, 18, 34, 0.84));
+      }
+
+      .practice-inline-card:hover,
+      .practice-inline-card.active {
+        transform: translateY(-2px);
+        border-color: rgba(255, 180, 84, 0.72);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+      }
+
+      .practice-inline-kicker {
+        color: #ffcf7b;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .practice-inline-meta {
+        margin-top: 10px;
+        color: #ffd89a;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .practice-inline-detail {
+        border: 1px solid rgba(255, 180, 84, 0.22);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(32, 24, 18, 0.3), rgba(18, 26, 47, 0.92));
+        padding: 14px;
+      }
+
+      .practice-inline-detail ol {
+        margin: 10px 0 0;
+        padding-left: 18px;
+      }
+
+      .practice-inline-detail li + li {
+        margin-top: 6px;
       }
 
       .track-header {
@@ -437,6 +664,18 @@
         font-size: 14px;
       }
 
+      .detail-section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .detail-section-head h4 {
+        margin: 0;
+      }
+
       .detail-list {
         display: flex;
         flex-direction: column;
@@ -493,6 +732,16 @@
           grid-template-columns: 1fr;
         }
 
+        .panel-title {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .graph-actions {
+          width: 100%;
+          justify-content: flex-start;
+        }
+
         .page {
           padding: 16px;
         }
@@ -519,7 +768,10 @@
       <section class="controls">
         <div class="control-group">
           <label for="searchInput">搜索节点</label>
-          <input id="searchInput" type="text" placeholder="输入人物、观点、著作或关键词" />
+          <div class="search-row">
+            <input id="searchInput" type="text" placeholder="输入人物、观点、著作或关键词，回车可自动定位" />
+            <button class="search-action-btn" id="locateSearchBtn" type="button">定位</button>
+          </div>
         </div>
         <div class="control-group">
           <label for="domainSelect">学科筛选</label>
@@ -537,22 +789,40 @@
             <option value="work">著作/作品</option>
           </select>
         </div>
+        <div class="control-group">
+          <label for="neighborSelect">图谱范围</label>
+          <select id="neighborSelect">
+            <option value="all">全部节点</option>
+            <option value="one-hop">只看一跳邻居</option>
+            <option value="two-hop">只看两跳邻居</option>
+          </select>
+        </div>
       </section>
 
       <div class="tabs" id="tabs">
         <button class="tab-btn active" data-tab="graph">知识图谱</button>
         <button class="tab-btn" data-tab="timeline">发展轨迹</button>
         <button class="tab-btn" data-tab="relations">关联关系</button>
+        <button class="tab-btn" data-tab="practice">实践参考</button>
       </div>
 
       <section class="layout">
         <div>
           <div class="panel view active" id="view-graph">
             <div class="panel-title">
-              <h2>知识图谱</h2>
-              <span>点击节点可高亮其直接关联</span>
+              <div class="panel-copy">
+                <h2>知识图谱</h2>
+                <span>点击节点可高亮其直接关联，支持自动布局与固定节点</span>
+              </div>
+              <div class="graph-actions">
+                <button class="panel-btn" id="togglePinBtn" type="button" disabled>固定当前节点</button>
+                <button class="panel-btn" id="relayoutBtn" type="button">自动布局重排</button>
+              </div>
             </div>
-            <svg id="graphSvg" viewBox="0 0 1180 760"></svg>
+            <div class="graph-stage" id="graphStage">
+              <svg id="graphSvg" viewBox="0 0 1180 760"></svg>
+              <div class="graph-tooltip" id="graphTooltip"></div>
+            </div>
             <div class="legend" id="graphLegend"></div>
           </div>
 
@@ -574,17 +844,25 @@
               <div id="relationInspector"></div>
             </div>
           </div>
+
+          <div class="panel view" id="view-practice">
+            <div class="panel-title">
+              <h2>实践参考</h2>
+              <span>把理论转成可执行的小习惯、操作指南与日常应用</span>
+            </div>
+            <div class="practice-grid" id="practiceGrid"></div>
+          </div>
         </div>
 
         <aside class="panel" id="detailPanel">
           <div class="detail-title-wrap">
             <div>
               <h3 class="detail-title">说明面板</h3>
-              <div class="detail-sub">点击图谱节点或发展阶段查看详细说明</div>
+              <div class="detail-sub">点击节点可锁定，重复点击或点击空白可取消；按 Esc 可清空选中</div>
             </div>
           </div>
           <div class="empty" id="detailContent">
-            这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作与关系说明。
+            这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作、关系说明，以及现实生活中的实践建议。
           </div>
         </aside>
       </section>
@@ -634,14 +912,46 @@
         implemented_with_attention_to: '实践时需考虑'
       };
 
+      const GRAPH_WIDTH = 1180;
+      const GRAPH_HEIGHT = 760;
+      const LAYOUT_STORAGE_KEY = 'awesome_knowledge:child_education:layout:v2';
+
       const state = {
         data: null,
         selectedNodeId: null,
+        hoverNodeId: null,
+        fixedNodes: new Set(),
         selectedStage: null,
+        selectedPracticeId: null,
         currentTab: 'graph',
         positions: new Map(),
+        viewport: {
+          scale: 1,
+          tx: 0,
+          ty: 0
+        },
+        graphAnimationFrame: null,
+        layoutSaveTimer: null,
         dragging: null,
+        panning: null,
         didDrag: false,
+        didPan: false,
+        dragThreshold: 8,
+        panThreshold: 8,
+        preventBackgroundClick: false,
+        layoutSeed: 0,
+        graphScope: 'all',
+        flashNodeId: null,
+        flashTimer: null,
+        collapsedSections: {
+          directRelations: false
+        },
+        tooltip: {
+          nodeId: null,
+          visible: false,
+          x: 0,
+          y: 0
+        },
         filters: {
           search: '',
           domain: '全部',
@@ -651,12 +961,19 @@
 
       const el = {
         stats: document.getElementById('stats'),
+        graphStage: document.getElementById('graphStage'),
         graphSvg: document.getElementById('graphSvg'),
+        graphTooltip: document.getElementById('graphTooltip'),
         graphLegend: document.getElementById('graphLegend'),
+        togglePinBtn: document.getElementById('togglePinBtn'),
+        relayoutBtn: document.getElementById('relayoutBtn'),
+        locateSearchBtn: document.getElementById('locateSearchBtn'),
         searchInput: document.getElementById('searchInput'),
         domainSelect: document.getElementById('domainSelect'),
+        neighborSelect: document.getElementById('neighborSelect'),
         typeSelect: document.getElementById('typeSelect'),
         timelineGrid: document.getElementById('timelineGrid'),
+        practiceGrid: document.getElementById('practiceGrid'),
         relationNodeList: document.getElementById('relationNodeList'),
         relationInspector: document.getElementById('relationInspector'),
         detailContent: document.getElementById('detailContent'),
@@ -673,6 +990,7 @@
           }
           const data = await response.json();
           state.data = normalizeData(data);
+          restorePersistedLayout();
           buildDomainFilter();
           renderStats();
           renderLegend();
@@ -703,9 +1021,27 @@
       }
 
       function bindEvents() {
+        el.togglePinBtn.addEventListener('click', () => {
+          toggleFixedSelectedNode();
+        });
+
+        el.relayoutBtn.addEventListener('click', () => {
+          triggerAutoRelayout();
+        });
+
+        el.locateSearchBtn.addEventListener('click', () => {
+          locateSearchMatch();
+        });
+
         el.searchInput.addEventListener('input', (event) => {
           state.filters.search = event.target.value.trim().toLowerCase();
           renderAll();
+        });
+
+        el.searchInput.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter') return;
+          event.preventDefault();
+          locateSearchMatch();
         });
 
         el.domainSelect.addEventListener('change', (event) => {
@@ -715,6 +1051,11 @@
 
         el.typeSelect.addEventListener('change', (event) => {
           state.filters.type = event.target.value;
+          renderAll();
+        });
+
+        el.neighborSelect.addEventListener('change', (event) => {
+          state.graphScope = event.target.value;
           renderAll();
         });
 
@@ -728,25 +1069,97 @@
           renderDetailPanel();
         });
 
+        document.addEventListener('keydown', (event) => {
+          if (event.key !== 'Escape') return;
+          clearSelection();
+        });
+
         el.graphSvg.addEventListener('pointermove', (event) => {
+          if (state.panning) {
+            const point = getSvgPoint(event);
+            const moved = Math.hypot(point.x - state.panning.startPoint.x, point.y - state.panning.startPoint.y);
+            if (!state.didPan && moved < state.panThreshold) return;
+            state.didPan = true;
+            state.viewport.tx = state.panning.startViewport.tx + (point.x - state.panning.startPoint.x);
+            state.viewport.ty = state.panning.startViewport.ty + (point.y - state.panning.startPoint.y);
+            hideTooltip();
+            renderGraph();
+            return;
+          }
           if (!state.dragging) return;
           const point = getSvgPoint(event);
+          updateTooltipPosition(event);
+          const moved = Math.hypot(point.x - state.dragging.startPoint.x, point.y - state.dragging.startPoint.y);
+          if (!state.didDrag && moved < state.dragThreshold) return;
           state.positions.set(state.dragging.nodeId, point);
           state.didDrag = true;
+          renderTooltip();
           renderGraph();
         });
 
         el.graphSvg.addEventListener('pointerup', (event) => {
+          if (state.panning) {
+            try { el.graphSvg.releasePointerCapture(event.pointerId); } catch (_) {}
+            state.preventBackgroundClick = state.didPan;
+            state.panning = null;
+            const shouldPersist = state.didPan;
+            state.didPan = false;
+            if (shouldPersist) schedulePersistLayout();
+            return;
+          }
+
+          const draggingNodeId = state.dragging?.nodeId || null;
+          const shouldSelectNode = Boolean(draggingNodeId && !state.didDrag);
           if (state.dragging) {
             try { el.graphSvg.releasePointerCapture(event.pointerId); } catch (_) {}
           }
           state.dragging = null;
-          setTimeout(() => { state.didDrag = false; }, 0);
+          const shouldPersistLayout = state.didDrag;
+          state.didDrag = false;
+          if (shouldPersistLayout) schedulePersistLayout();
+          if (shouldSelectNode) {
+            toggleNodeSelection(draggingNodeId);
+          }
         });
 
         el.graphSvg.addEventListener('pointercancel', () => {
           state.dragging = null;
+          state.panning = null;
           state.didDrag = false;
+          state.didPan = false;
+          hideTooltip();
+        });
+
+        el.graphSvg.addEventListener('wheel', (event) => {
+          event.preventDefault();
+          const point = getSvgPoint(event);
+          const prevScale = state.viewport.scale;
+          const nextScale = clampNumber(prevScale * (event.deltaY < 0 ? 1.12 : 0.9), 0.65, 2.5);
+          if (Math.abs(nextScale - prevScale) < 0.001) return;
+          const localX = (point.x - state.viewport.tx) / prevScale;
+          const localY = (point.y - state.viewport.ty) / prevScale;
+          state.viewport.scale = nextScale;
+          state.viewport.tx = point.x - localX * nextScale;
+          state.viewport.ty = point.y - localY * nextScale;
+          hideTooltip();
+          schedulePersistLayout();
+          renderGraph();
+        }, { passive: false });
+
+        el.graphSvg.addEventListener('click', (event) => {
+          if (state.preventBackgroundClick) {
+            state.preventBackgroundClick = false;
+            return;
+          }
+          if (!(event.target === el.graphSvg || event.target.getAttribute('data-canvas-bg') === 'true')) return;
+          clearSelection();
+        });
+
+        el.graphSvg.addEventListener('pointerleave', () => {
+          hideTooltip();
+          if (!state.hoverNodeId) return;
+          state.hoverNodeId = null;
+          renderAll();
         });
       }
 
@@ -761,13 +1174,27 @@
       }
 
       function renderAll() {
+        renderGraphControls();
         renderGraph();
         renderTimeline();
+        renderPracticeGuides();
         renderRelations();
         renderDetailPanel();
       }
 
-      function getFilteredNodes() {
+      function renderGraphControls() {
+        const selectedNode = state.selectedNodeId ? state.data.nodeMap.get(state.selectedNodeId) : null;
+        const isFixed = selectedNode ? state.fixedNodes.has(selectedNode.id) : false;
+        el.neighborSelect.value = state.graphScope;
+        el.togglePinBtn.disabled = !selectedNode;
+        el.togglePinBtn.textContent = !selectedNode
+          ? '固定当前节点'
+          : isFixed
+            ? `取消固定：${getNodeDisplayName(selectedNode)}`
+            : `固定：${getNodeDisplayName(selectedNode)}`;
+      }
+
+      function getBaseFilteredNodes() {
         return state.data.nodes.filter((node) => {
           const matchDomain = state.filters.domain === '全部' || node.domain === state.filters.domain || node.name === state.filters.domain;
           const matchType = state.filters.type === '全部' || node.type === state.filters.type;
@@ -779,8 +1206,44 @@
         });
       }
 
+      function getFilteredNodes() {
+        return getBaseFilteredNodes();
+      }
+
       function getFilteredEdges(nodeIds) {
         return state.data.edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+      }
+
+      function getGraphScopedData() {
+        const baseNodes = getBaseFilteredNodes();
+        const baseNodeIds = new Set(baseNodes.map((node) => node.id));
+        const baseEdges = getFilteredEdges(baseNodeIds);
+        const focusNodeId = getFocusNodeId();
+
+        if (!focusNodeId || !baseNodeIds.has(focusNodeId) || state.graphScope === 'all') {
+          return { nodes: baseNodes, edges: baseEdges };
+        }
+
+        const maxDepth = state.graphScope === 'one-hop' ? 1 : 2;
+        const visibleIds = new Set([focusNodeId]);
+        const queue = [{ nodeId: focusNodeId, depth: 0 }];
+
+        while (queue.length) {
+          const { nodeId, depth } = queue.shift();
+          if (depth >= maxDepth) continue;
+          const adjacency = state.data.adjacency.get(nodeId) || [];
+          adjacency.forEach((edge) => {
+            const nextId = edge.source === nodeId ? edge.target : edge.source;
+            if (!baseNodeIds.has(nextId) || visibleIds.has(nextId)) return;
+            visibleIds.add(nextId);
+            queue.push({ nodeId: nextId, depth: depth + 1 });
+          });
+        }
+
+        return {
+          nodes: baseNodes.filter((node) => visibleIds.has(node.id)),
+          edges: baseEdges.filter((edge) => visibleIds.has(edge.source) && visibleIds.has(edge.target))
+        };
       }
 
       function renderStats() {
@@ -814,14 +1277,324 @@
         el.graphLegend.innerHTML = legendItems;
       }
 
-      function renderGraph() {
-        const nodes = getFilteredNodes();
-        const nodeIds = new Set(nodes.map((node) => node.id));
-        const edges = getFilteredEdges(nodeIds);
-        const selectedId = state.selectedNodeId && nodeIds.has(state.selectedNodeId) ? state.selectedNodeId : null;
-        if (!selectedId && state.currentTab === 'graph') {
-          state.selectedNodeId = nodes[0]?.id || null;
+      function buildBaseLayout(nodes) {
+        const domains = state.data.metadata.domains;
+        const height = 760;
+        const left = 120;
+        const top = 68;
+        const domainGap = 320;
+        const laneGap = 138;
+        const positions = new Map();
+        const bounds = new Map();
+
+        domains.forEach((domain, domainIndex) => {
+          const xCenter = left + domainIndex * domainGap;
+
+          TYPE_ORDER.forEach((type, laneIndex) => {
+            const yLane = top + laneIndex * laneGap;
+            const bucket = nodes.filter((node) => {
+              if (type === 'domain') return node.type === 'domain' && node.name === domain;
+              return node.domain === domain && node.type === type;
+            });
+
+            if (!bucket.length) return;
+            const spacing = Math.min(92, Math.max(52, (height - 140) / Math.max(bucket.length, 1)));
+            const startY = yLane - ((bucket.length - 1) * spacing) / 2;
+            const extraY = Math.max(32, Math.min(96, spacing * 0.8));
+            const xPadding = type === 'domain' ? 46 : 88;
+
+            bucket.forEach((node, index) => {
+              const x = xCenter + ((index % 2 === 0 ? -1 : 1) * Math.min(42, Math.floor(index / 2) * 14));
+              const y = startY + index * spacing;
+              positions.set(node.id, { x, y });
+              bounds.set(node.id, {
+                minX: xCenter - xPadding,
+                maxX: xCenter + xPadding,
+                minY: startY - extraY,
+                maxY: startY + ((bucket.length - 1) * spacing) + extraY
+              });
+            });
+          });
+        });
+
+        return { positions, bounds };
+      }
+
+      function ensureValidNodeState(nodeIds) {
+        if (state.selectedNodeId && !nodeIds.has(state.selectedNodeId)) state.selectedNodeId = null;
+        if (state.hoverNodeId && !nodeIds.has(state.hoverNodeId)) state.hoverNodeId = null;
+        if (state.tooltip.nodeId && !nodeIds.has(state.tooltip.nodeId)) hideTooltip();
+        state.fixedNodes.forEach((nodeId) => {
+          if (!nodeIds.has(nodeId)) state.fixedNodes.delete(nodeId);
+        });
+        [...state.positions.keys()].forEach((nodeId) => {
+          if (!nodeIds.has(nodeId)) state.positions.delete(nodeId);
+        });
+      }
+
+      function computeAutoLayout(nodes, edges, baseLayout) {
+        const working = new Map();
+        nodes.forEach((node) => {
+          const base = baseLayout.positions.get(node.id);
+          const current = state.positions.get(node.id) || base;
+          working.set(node.id, { x: current.x, y: current.y });
+        });
+
+        const nodeList = nodes.map((node) => ({
+          id: node.id,
+          type: node.type,
+          locked: state.fixedNodes.has(node.id) || state.dragging?.nodeId === node.id
+        }));
+
+        for (let iteration = 0; iteration < 18; iteration += 1) {
+          const deltas = new Map(nodeList.map((node) => [node.id, { x: 0, y: 0 }]));
+
+          nodeList.forEach((node) => {
+            if (node.locked) return;
+            const base = baseLayout.positions.get(node.id);
+            const current = working.get(node.id);
+            deltas.get(node.id).x += (base.x - current.x) * 0.11;
+            deltas.get(node.id).y += (base.y - current.y) * 0.14;
+          });
+
+          edges.forEach((edge) => {
+            const source = working.get(edge.source);
+            const target = working.get(edge.target);
+            if (!source || !target) return;
+            const dx = target.x - source.x;
+            const dy = target.y - source.y;
+            const distance = Math.hypot(dx, dy) || 1;
+            const desired = edge.source === edge.target ? 0 : 88;
+            const pull = (distance - desired) * 0.025;
+            const fx = (dx / distance) * pull;
+            const fy = (dy / distance) * pull;
+            if (!nodeList.find((node) => node.id === edge.source)?.locked) {
+              deltas.get(edge.source).x += fx;
+              deltas.get(edge.source).y += fy;
+            }
+            if (!nodeList.find((node) => node.id === edge.target)?.locked) {
+              deltas.get(edge.target).x -= fx;
+              deltas.get(edge.target).y -= fy;
+            }
+          });
+
+          for (let i = 0; i < nodeList.length; i += 1) {
+            for (let j = i + 1; j < nodeList.length; j += 1) {
+              const a = nodeList[i];
+              const b = nodeList[j];
+              const pointA = working.get(a.id);
+              const pointB = working.get(b.id);
+              const dx = pointB.x - pointA.x;
+              const dy = pointB.y - pointA.y;
+              const distance = Math.hypot(dx, dy) || 1;
+              const minDistance = a.type === 'domain' || b.type === 'domain' ? 54 : 42;
+              if (distance >= minDistance) continue;
+              const push = (minDistance - distance) * 0.12;
+              const fx = (dx / distance) * push;
+              const fy = (dy / distance) * push;
+              if (!a.locked) {
+                deltas.get(a.id).x -= fx;
+                deltas.get(a.id).y -= fy;
+              }
+              if (!b.locked) {
+                deltas.get(b.id).x += fx;
+                deltas.get(b.id).y += fy;
+              }
+            }
+          }
+
+          nodeList.forEach((node) => {
+            const current = working.get(node.id);
+            const bounds = baseLayout.bounds.get(node.id);
+            if (!current || !bounds || node.locked) return;
+            const delta = deltas.get(node.id);
+            working.set(node.id, clampPoint({
+              x: current.x + delta.x,
+              y: current.y + delta.y
+            }, bounds));
+          });
         }
+
+        return working;
+      }
+
+      function updateLayoutPositions(nodes, edges, baseLayout) {
+        let layoutChanged = false;
+        nodes.forEach((node) => {
+          if (!state.positions.has(node.id)) {
+            const base = baseLayout.positions.get(node.id);
+            if (base) {
+              state.positions.set(node.id, { ...base });
+              layoutChanged = true;
+            }
+          }
+        });
+
+        const targets = computeAutoLayout(nodes, edges, baseLayout);
+        let shouldAnimate = false;
+
+        nodes.forEach((node) => {
+          const current = state.positions.get(node.id);
+          const target = targets.get(node.id) || current || baseLayout.positions.get(node.id);
+          if (!current || !target) return;
+
+          if (state.dragging?.nodeId === node.id || state.fixedNodes.has(node.id)) {
+            state.positions.set(node.id, target === current ? current : { x: current.x, y: current.y });
+            return;
+          }
+
+          const dx = target.x - current.x;
+          const dy = target.y - current.y;
+          if (Math.abs(dx) < 0.4 && Math.abs(dy) < 0.4) {
+            if (Math.abs(current.x - target.x) >= 0.05 || Math.abs(current.y - target.y) >= 0.05) {
+              state.positions.set(node.id, { x: target.x, y: target.y });
+              layoutChanged = true;
+            }
+            return;
+          }
+
+          shouldAnimate = true;
+          layoutChanged = true;
+          state.positions.set(node.id, {
+            x: current.x + dx * 0.22,
+            y: current.y + dy * 0.22
+          });
+        });
+
+        if (layoutChanged && !state.dragging && !state.panning) {
+          schedulePersistLayout();
+        }
+
+        if (shouldAnimate && !state.dragging) {
+          requestGraphAnimation();
+        }
+      }
+
+      function requestGraphAnimation() {
+        if (state.graphAnimationFrame) return;
+        state.graphAnimationFrame = requestAnimationFrame(() => {
+          state.graphAnimationFrame = null;
+          renderGraph();
+        });
+      }
+
+      function getViewportTransform() {
+        const { scale, tx, ty } = state.viewport;
+        return `matrix(${scale} 0 0 ${scale} ${tx} ${ty})`;
+      }
+
+      function startPan(event) {
+        state.panning = {
+          startPoint: getSvgPoint(event),
+          startViewport: { ...state.viewport }
+        };
+        state.didPan = false;
+        hideTooltip();
+        el.graphSvg.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      function schedulePersistLayout() {
+        clearTimeout(state.layoutSaveTimer);
+        state.layoutSaveTimer = setTimeout(() => {
+          persistLayoutState();
+        }, 450);
+      }
+
+      function persistLayoutState() {
+        try {
+          const payload = {
+            positions: Object.fromEntries([...state.positions.entries()].map(([nodeId, point]) => [nodeId, {
+              x: Number(point.x.toFixed(2)),
+              y: Number(point.y.toFixed(2))
+            }])),
+            fixedNodes: [...state.fixedNodes],
+            viewport: {
+              scale: Number(state.viewport.scale.toFixed(3)),
+              tx: Number(state.viewport.tx.toFixed(2)),
+              ty: Number(state.viewport.ty.toFixed(2))
+            },
+            graphScope: state.graphScope
+          };
+          localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(payload));
+        } catch (_) {}
+      }
+
+      function restorePersistedLayout() {
+        try {
+          const raw = localStorage.getItem(LAYOUT_STORAGE_KEY);
+          if (!raw) return;
+          const payload = JSON.parse(raw);
+          if (payload.positions && typeof payload.positions === 'object') {
+            state.positions = new Map(Object.entries(payload.positions).map(([nodeId, point]) => [nodeId, {
+              x: Number(point.x),
+              y: Number(point.y)
+            }]));
+          }
+          if (Array.isArray(payload.fixedNodes)) {
+            state.fixedNodes = new Set(payload.fixedNodes);
+          }
+          if (payload.viewport) {
+            state.viewport.scale = clampNumber(Number(payload.viewport.scale) || 1, 0.65, 2.5);
+            state.viewport.tx = Number(payload.viewport.tx) || 0;
+            state.viewport.ty = Number(payload.viewport.ty) || 0;
+          }
+          if (payload.graphScope) {
+            state.graphScope = payload.graphScope;
+          }
+        } catch (_) {}
+      }
+
+      function flashNode(nodeId) {
+        state.flashNodeId = nodeId;
+        clearTimeout(state.flashTimer);
+        state.flashTimer = setTimeout(() => {
+          state.flashNodeId = null;
+          renderGraph();
+        }, 1500);
+      }
+
+      function centerViewportOnNode(nodeId, { flash = true } = {}) {
+        const point = state.positions.get(nodeId);
+        if (!point) return;
+        const nextScale = Math.max(state.viewport.scale, 1.12);
+        state.viewport.scale = nextScale;
+        state.viewport.tx = GRAPH_WIDTH / 2 - point.x * nextScale;
+        state.viewport.ty = GRAPH_HEIGHT / 2 - point.y * nextScale;
+        if (flash) flashNode(nodeId);
+        schedulePersistLayout();
+        renderGraph();
+      }
+
+      function locateSearchMatch() {
+        const query = state.filters.search.trim().toLowerCase();
+        if (!query) return;
+        const candidates = getBaseFilteredNodes();
+        if (!candidates.length) return;
+
+        const exact = candidates.find((node) => [node.name, node.name_zh]
+          .filter(Boolean)
+          .some((text) => String(text).toLowerCase() === query));
+        const target = exact || candidates[0];
+        state.selectedNodeId = target.id;
+        state.selectedStage = null;
+        state.selectedPracticeId = null;
+        state.currentTab = 'graph';
+        document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === 'graph'));
+        document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+        document.getElementById('view-graph').classList.add('active');
+        renderAll();
+        centerViewportOnNode(target.id, { flash: true });
+      }
+
+      function renderGraph() {
+        const { nodes, edges } = getGraphScopedData();
+        const nodeIds = new Set(nodes.map((node) => node.id));
+        ensureValidNodeState(nodeIds);
+        const focusNodeId = getFocusNodeId();
+        const baseLayout = buildBaseLayout(nodes);
+        updateLayoutPositions(nodes, edges, baseLayout);
 
         const svg = el.graphSvg;
         svg.innerHTML = '';
@@ -831,84 +1604,74 @@
           return;
         }
 
-        const domains = state.data.metadata.domains;
-        const width = 1180;
-        const height = 760;
-        const left = 120;
-        const top = 68;
-        const domainGap = 320;
-        const laneGap = 138;
-        const positionMap = new Map();
+        const viewportGroup = createSvg('g', { transform: getViewportTransform() });
+        const background = createSvg('rect', {
+          x: 0,
+          y: 0,
+          width: GRAPH_WIDTH,
+          height: GRAPH_HEIGHT,
+          fill: 'transparent',
+          'data-canvas-bg': 'true'
+        });
+        background.addEventListener('pointerdown', (event) => {
+          startPan(event);
+        });
+        viewportGroup.appendChild(background);
+        svg.appendChild(viewportGroup);
 
-        domains.forEach((domain, domainIndex) => {
-          const xCenter = left + domainIndex * domainGap;
+        state.data.metadata.domains.forEach((domain, domainIndex) => {
+          const xCenter = 120 + domainIndex * 320;
           const domainLabel = createSvg('text', {
             x: xCenter,
             y: 36,
             class: 'domain-label',
             'text-anchor': 'middle'
           }, domain);
-          svg.appendChild(domainLabel);
+          viewportGroup.appendChild(domainLabel);
 
           TYPE_ORDER.forEach((type, laneIndex) => {
-            const yLane = top + laneIndex * laneGap;
+            const yLane = 68 + laneIndex * 138;
             const laneText = domainIndex === 0
               ? createSvg('text', { x: 20, y: yLane + 4, class: 'lane-label' }, TYPE_LABELS[type])
               : null;
-            if (laneText) svg.appendChild(laneText);
-
-            const bucket = nodes.filter((node) => {
-              if (type === 'domain') return node.type === 'domain' && node.name === domain;
-              return node.domain === domain && node.type === type;
-            });
-
-            if (!bucket.length) return;
-            const spacing = Math.min(92, Math.max(52, (height - 140) / Math.max(bucket.length, 1)));
-            const startY = yLane - ((bucket.length - 1) * spacing) / 2;
-            bucket.forEach((node, index) => {
-              const x = xCenter + ((index % 2 === 0 ? -1 : 1) * Math.min(42, Math.floor(index / 2) * 14));
-              const y = startY + index * spacing;
-              const defaultPosition = { x, y };
-              if (!state.positions.has(node.id)) {
-                state.positions.set(node.id, defaultPosition);
-              }
-              positionMap.set(node.id, state.positions.get(node.id));
-            });
+            if (laneText) viewportGroup.appendChild(laneText);
           });
         });
 
         const selectedNeighbors = new Set();
-        if (state.selectedNodeId) {
-          state.data.adjacency.get(state.selectedNodeId)?.forEach((edge) => {
+        if (focusNodeId) {
+          state.data.adjacency.get(focusNodeId)?.forEach((edge) => {
             selectedNeighbors.add(edge.source);
             selectedNeighbors.add(edge.target);
           });
         }
 
         edges.forEach((edge) => {
-          const source = positionMap.get(edge.source);
-          const target = positionMap.get(edge.target);
+          const source = state.positions.get(edge.source);
+          const target = state.positions.get(edge.target);
           if (!source || !target) return;
           const line = createSvg('line', {
             x1: source.x,
             y1: source.y,
             x2: target.x,
             y2: target.y,
-            class: `edge ${isEdgeActive(edge) ? 'active' : ''} ${isGraphDimmed(edge) ? 'dimmed' : ''}`
+            class: `edge ${isEdgeActive(edge) ? 'active' : ''} ${state.hoverNodeId && !state.selectedNodeId && isEdgeActive(edge) ? 'preview' : ''} ${isGraphDimmed(edge) ? 'dimmed' : ''}`
           });
           line.addEventListener('click', () => {
             state.selectedNodeId = edge.source;
             state.selectedStage = null;
+            state.selectedPracticeId = null;
             renderAll();
+            centerViewportOnNode(edge.source, { flash: true });
           });
-          svg.appendChild(line);
+          viewportGroup.appendChild(line);
         });
 
         nodes.forEach((node) => {
-          const pos = positionMap.get(node.id);
+          const pos = state.positions.get(node.id);
           if (!pos) return;
           const g = createSvg('g', {
-            class: `node ${state.selectedNodeId === node.id ? 'active' : ''} ${isNodeDimmed(node.id, selectedNeighbors) ? 'dimmed' : ''}`,
+            class: `node ${focusNodeId === node.id ? 'active' : ''} ${state.flashNodeId === node.id ? 'flash' : ''} ${state.fixedNodes.has(node.id) ? 'fixed' : ''} ${isNodeDimmed(node.id, selectedNeighbors) ? 'dimmed' : ''}`,
             transform: `translate(${pos.x}, ${pos.y})`
           });
           const radius = getNodeRadius(node.type);
@@ -923,21 +1686,39 @@
           g.appendChild(circle);
           g.appendChild(label);
           g.addEventListener('pointerdown', (event) => {
-            state.dragging = { nodeId: node.id };
+            const current = state.positions.get(node.id) || pos;
+            state.dragging = {
+              nodeId: node.id,
+              startPoint: getSvgPoint(event),
+              origin: { x: current.x, y: current.y },
+              wasFixed: state.fixedNodes.has(node.id)
+            };
             state.didDrag = false;
-            const current = positionMap.get(node.id);
             state.positions.set(node.id, { x: current.x, y: current.y });
+            showTooltip(node.id, event);
             el.graphSvg.setPointerCapture(event.pointerId);
             event.preventDefault();
+            event.stopPropagation();
           });
-          g.addEventListener('click', () => {
-            if (state.didDrag) return;
-            state.selectedNodeId = node.id;
-            state.selectedStage = null;
+          g.addEventListener('pointerenter', () => {
+            if (state.selectedNodeId === node.id) return;
+            if (state.hoverNodeId === node.id) return;
+            state.hoverNodeId = node.id;
             renderAll();
           });
-          svg.appendChild(g);
+          g.addEventListener('pointermove', (event) => {
+            showTooltip(node.id, event);
+          });
+          g.addEventListener('pointerleave', () => {
+            hideTooltip();
+            if (state.hoverNodeId !== node.id) return;
+            state.hoverNodeId = null;
+            renderAll();
+          });
+          viewportGroup.appendChild(g);
         });
+
+        renderTooltip();
       }
 
       function renderTimeline() {
@@ -975,6 +1756,52 @@
             const stage = track.stages.find((item) => stageKey(track, item) === card.dataset.stage);
             state.selectedStage = { ...stage, trackTitle: track.title, domain: track.domain, key: card.dataset.stage };
             state.selectedNodeId = stage.node_refs?.[0] || null;
+            state.selectedPracticeId = null;
+            renderAll();
+            if (state.selectedNodeId) centerViewportOnNode(state.selectedNodeId, { flash: true });
+          });
+        });
+      }
+
+      function getFilteredPractices() {
+        const search = state.filters.search;
+        return (state.data.practical_guides || []).filter((guide) => {
+          const matchDomain = state.filters.domain === '全部' || guide.domain === state.filters.domain;
+          const text = [guide.title, guide.scenario, guide.habit, guide.daily_use, ...(guide.steps || [])]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+          const matchSearch = !search || text.includes(search);
+          return matchDomain && matchSearch;
+        });
+      }
+
+      function getRelatedPracticeGuides(nodeId) {
+        return (state.data.practical_guides || []).filter((guide) => (guide.related_nodes || []).includes(nodeId));
+      }
+
+      function renderPracticeGuides() {
+        if (!el.practiceGrid) return;
+        const guides = getFilteredPractices();
+        if (!state.selectedPracticeId || !guides.some((guide) => guide.id === state.selectedPracticeId)) {
+          state.selectedPracticeId = guides[0]?.id || null;
+        }
+        if (!guides.length) {
+          el.practiceGrid.innerHTML = '<div class="empty">当前筛选条件下没有可显示的实践建议。</div>';
+          return;
+        }
+
+        el.practiceGrid.innerHTML = guides.map((guide) => `
+          <div class="practice-card ${state.selectedPracticeId === guide.id ? 'active' : ''}" data-practice-id="${guide.id}">
+            <div class="practice-domain">${guide.domain} · 实践参考</div>
+            <div class="practice-title">${guide.title}</div>
+            <div class="practice-summary">${guide.habit}</div>
+          </div>
+        `).join('');
+
+        el.practiceGrid.querySelectorAll('[data-practice-id]').forEach((card) => {
+          card.addEventListener('click', () => {
+            state.selectedPracticeId = card.dataset.practiceId;
             renderAll();
           });
         });
@@ -988,13 +1815,13 @@
           return;
         }
 
-        if (!state.selectedNodeId || !nodes.some((node) => node.id === state.selectedNodeId)) {
-          state.selectedNodeId = nodes[0].id;
-        }
+        const inspectorNodeId = state.selectedNodeId && state.data.nodeMap.has(state.selectedNodeId)
+          ? state.selectedNodeId
+          : nodes[0].id;
 
         el.relationNodeList.innerHTML = nodes
           .map((node) => `
-            <div class="node-list-item ${state.selectedNodeId === node.id ? 'active' : ''}" data-node-id="${node.id}">
+            <div class="node-list-item ${inspectorNodeId === node.id ? 'active' : ''}" data-node-id="${node.id}">
               <strong>${getNodeDisplayName(node)}</strong>
               <small>${TYPE_LABELS[node.type]} · ${node.domain || '跨学科'}</small>
             </div>
@@ -1005,12 +1832,14 @@
           item.addEventListener('click', () => {
             state.selectedNodeId = item.dataset.nodeId;
             state.selectedStage = null;
+            state.selectedPracticeId = null;
             renderAll();
+            centerViewportOnNode(item.dataset.nodeId, { flash: true });
           });
         });
 
-        const node = state.data.nodeMap.get(state.selectedNodeId);
-        const adjacency = state.data.adjacency.get(state.selectedNodeId) || [];
+        const node = state.data.nodeMap.get(inspectorNodeId);
+        const adjacency = state.data.adjacency.get(inspectorNodeId) || [];
         const outgoing = adjacency.filter((edge) => edge.direction === 'out');
         const incoming = adjacency.filter((edge) => edge.direction === 'in');
         const related = adjacency.map((edge) => edge.direction === 'out' ? edge.targetNode : edge.sourceNode);
@@ -1035,7 +1864,9 @@
           chip.addEventListener('click', () => {
             state.selectedNodeId = chip.dataset.focusNode;
             state.selectedStage = null;
+            state.selectedPracticeId = null;
             renderAll();
+            centerViewportOnNode(chip.dataset.focusNode, { flash: true });
           });
         });
       }
@@ -1071,11 +1902,64 @@
           renderStageDetail();
           return;
         }
+        if (state.currentTab === 'practice' && state.selectedPracticeId) {
+          renderPracticeDetail();
+          return;
+        }
         if (state.selectedNodeId && state.data.nodeMap.has(state.selectedNodeId)) {
           renderNodeDetail();
           return;
         }
-        el.detailContent.innerHTML = '这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作与关系说明。';
+        if (!state.selectedNodeId && state.hoverNodeId && state.data.nodeMap.has(state.hoverNodeId)) {
+          renderNodeDetail(state.hoverNodeId, true);
+          return;
+        }
+        el.detailContent.innerHTML = '这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作、关系说明，以及现实生活中的实践建议。';
+      }
+
+      function renderPracticeDetail() {
+        const guide = (state.data.practical_guides || []).find((item) => item.id === state.selectedPracticeId);
+        if (!guide) {
+          el.detailContent.innerHTML = '这里会展示可直接用于家庭、教学和日常协作的实践建议。';
+          return;
+        }
+        const relatedNodes = (guide.related_nodes || []).map((id) => state.data.nodeMap.get(id)).filter(Boolean);
+        el.detailContent.innerHTML = `
+          <div class="detail-item">
+            <strong>${guide.title}</strong>
+            <p>${guide.domain} · 现实生活实践参考</p>
+            <p style="margin-top:10px;">${guide.scenario}</p>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-head">
+              <h4>可以立刻开始的小习惯</h4>
+            </div>
+            <div class="detail-item"><p>${guide.habit}</p></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-head">
+              <h4>操作指南</h4>
+            </div>
+            <div class="detail-item">
+              <ol class="practice-steps">${(guide.steps || []).map((step) => `<li>${step}</li>`).join('')}</ol>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-head">
+              <h4>日常怎么用</h4>
+            </div>
+            <div class="detail-item"><p>${guide.daily_use}</p></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-head">
+              <h4>关联知识节点</h4>
+            </div>
+            <div class="relation-items">
+              ${relatedNodes.length ? relatedNodes.map((node) => relationChip(node)).join('') : '<span class="hint">暂无</span>'}
+            </div>
+          </div>
+        `;
+        bindDetailNodeLinks();
       }
 
       function renderStageDetail() {
@@ -1103,14 +1987,20 @@
         bindDetailNodeLinks();
       }
 
-      function renderNodeDetail() {
-        const node = state.data.nodeMap.get(state.selectedNodeId);
+      function renderNodeDetail(nodeId = state.selectedNodeId, isPreview = false) {
+        const node = state.data.nodeMap.get(nodeId);
+        if (!node) {
+          el.detailContent.innerHTML = '这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作、关系说明，以及现实生活中的实践建议。';
+          return;
+        }
         const adjacency = state.data.adjacency.get(node.id) || [];
         const outgoing = adjacency.filter((edge) => edge.direction === 'out');
         const incoming = adjacency.filter((edge) => edge.direction === 'in');
         const relatedNodes = adjacency
           .map((edge) => edge.direction === 'out' ? edge.targetNode : edge.sourceNode)
           .filter(Boolean);
+        const relatedGuides = getRelatedPracticeGuides(node.id);
+        const activePractice = relatedGuides.find((guide) => guide.id === state.selectedPracticeId) || relatedGuides[0] || null;
 
         const domainOverview = node.domain ? state.data.domain_overviews[node.domain] : null;
 
@@ -1118,10 +2008,17 @@
           <div class="detail-item">
             <strong>${getNodeDisplayName(node)}</strong>
             <p>${TYPE_LABELS[node.type]}${node.domain ? ` · ${node.domain}` : ''}</p>
+            ${isPreview ? '<p style="margin-top:8px;color:#ffcf7b;">悬停预览（未锁定）</p>' : ''}
             <p style="margin-top:10px;">${node.summary || '暂无摘要'}</p>
           </div>
           <div class="detail-section">
-            <h4>直接关系</h4>
+            <div class="detail-section-head">
+              <h4>直接关系</h4>
+              <button class="section-toggle-btn" type="button" data-toggle-section="directRelations">
+                ${state.collapsedSections.directRelations ? '展开' : '收起'}
+              </button>
+            </div>
+            ${state.collapsedSections.directRelations ? '<div class="empty">直接关系已折叠，点击右上角按钮展开。</div>' : `
             <div class="detail-list">
               ${[...outgoing, ...incoming].length ? [...outgoing, ...incoming].map((edge) => {
                 const target = edge.direction === 'out' ? edge.targetNode : edge.sourceNode;
@@ -1133,7 +2030,7 @@
                   </div>
                 `;
               }).join('') : '<div class="empty">当前节点没有可显示的直接关系。</div>'}
-            </div>
+            </div>`}
           </div>
           <div class="detail-section">
             <h4>关联节点总览</h4>
@@ -1152,9 +2049,103 @@
               </div>
             </div>
           ` : ''}
+          ${renderRelatedPracticeSection(node.id, activePractice?.id)}
+          ${activePractice ? renderInlinePracticeDetail(activePractice) : ''}
         `;
 
         bindDetailNodeLinks();
+      }
+
+      function renderRelatedPracticeSection(nodeId, activePracticeId) {
+        const guides = getRelatedPracticeGuides(nodeId);
+        if (!guides.length) return '';
+        return `
+          <div class="detail-section">
+            <div class="detail-section-head">
+              <h4>现实生活中的实践参考</h4>
+              <span class="hint">关联 ${guides.length} 条</span>
+            </div>
+            <div class="detail-item">
+              <p>点击下方卡片，右侧会直接展开该节点对应的实践建议，不必切换页面就能查看怎么在日常中使用。</p>
+            </div>
+            <div class="practice-inline-list">
+              ${guides.map((guide) => `
+                <div class="detail-item practice-inline-card ${activePracticeId === guide.id ? 'active' : ''}" data-inline-practice="${guide.id}">
+                  <div class="practice-inline-kicker">${guide.domain} · 实践参考</div>
+                  <strong>${guide.title}</strong>
+                  <p>${guide.habit}</p>
+                  <div class="practice-inline-meta">适用场景：${guide.scenario}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderInlinePracticeDetail(guide) {
+        return `
+          <div class="detail-section">
+            <div class="detail-section-head">
+              <h4>当前展开的实践指南</h4>
+              <span class="hint">${guide.domain} · 可立即行动</span>
+            </div>
+            <div class="practice-inline-detail">
+              <strong>${guide.title}</strong>
+              <p style="margin-top:10px;color:#bfd0ee;">小习惯：${guide.habit}</p>
+              <p style="margin-top:10px;color:#ffd89a;">适用场景：${guide.scenario}</p>
+              <ol class="practice-steps">${(guide.steps || []).map((step) => `<li>${step}</li>`).join('')}</ol>
+              <p style="margin-top:12px;color:#bfd0ee;">日常运用：${guide.daily_use}</p>
+              <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                <button class="section-toggle-btn" type="button" data-practice-card="${guide.id}">在“实践参考”页查看完整指南</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function toggleNodeSelection(nodeId) {
+        const nextId = state.selectedNodeId === nodeId ? null : nodeId;
+        state.selectedNodeId = nextId;
+        state.hoverNodeId = nextId ? null : state.hoverNodeId;
+        state.selectedStage = null;
+        if (nextId) state.selectedPracticeId = null;
+        renderAll();
+      }
+
+      function clearSelection() {
+        const hasState = Boolean(state.selectedNodeId || state.selectedStage || state.hoverNodeId || state.selectedPracticeId);
+        state.selectedNodeId = null;
+        state.selectedStage = null;
+        state.selectedPracticeId = null;
+        state.hoverNodeId = null;
+        hideTooltip();
+        if (hasState) renderAll();
+      }
+
+      function getFocusNodeId() {
+        return state.selectedNodeId || state.hoverNodeId || null;
+      }
+
+      function clampNumber(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function clampPoint(point, bounds) {
+        if (!bounds) return point;
+        return {
+          x: Math.max(bounds.minX, Math.min(bounds.maxX, point.x)),
+          y: Math.max(bounds.minY, Math.min(bounds.maxY, point.y))
+        };
+      }
+
+      function getSeededJitter(seedText) {
+        let seed = 0;
+        for (let i = 0; i < seedText.length; i += 1) {
+          seed = (seed * 31 + seedText.charCodeAt(i)) % 2147483647;
+        }
+        const x = Math.sin(seed * 0.17) * 0.9;
+        const y = Math.cos(seed * 0.11) * 0.9;
+        return { x, y };
       }
 
       function bindDetailNodeLinks() {
@@ -1163,13 +2154,117 @@
             const nextId = item.dataset.detailNode || item.dataset.focusNode;
             state.selectedNodeId = nextId;
             state.selectedStage = null;
+            state.selectedPracticeId = null;
             state.currentTab = 'graph';
             document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === 'graph'));
             document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
             document.getElementById('view-graph').classList.add('active');
             renderAll();
+            centerViewportOnNode(nextId, { flash: true });
           });
         });
+
+        el.detailContent.querySelectorAll('[data-practice-card]').forEach((item) => {
+          item.addEventListener('click', () => {
+            state.selectedPracticeId = item.dataset.practiceCard;
+            state.currentTab = 'practice';
+            document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === 'practice'));
+            document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+            document.getElementById('view-practice').classList.add('active');
+            renderAll();
+          });
+        });
+
+        el.detailContent.querySelectorAll('[data-inline-practice]').forEach((item) => {
+          item.addEventListener('click', () => {
+            state.selectedPracticeId = item.dataset.inlinePractice;
+            renderDetailPanel();
+            renderPracticeGuides();
+          });
+        });
+
+        el.detailContent.querySelectorAll('[data-toggle-section]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const sectionKey = button.dataset.toggleSection;
+            state.collapsedSections[sectionKey] = !state.collapsedSections[sectionKey];
+            renderDetailPanel();
+          });
+        });
+      }
+
+      function toggleFixedSelectedNode() {
+        const nodeId = state.selectedNodeId;
+        if (!nodeId) return;
+        if (state.fixedNodes.has(nodeId)) {
+          state.fixedNodes.delete(nodeId);
+        } else {
+          state.fixedNodes.add(nodeId);
+        }
+        renderAll();
+      }
+
+      function triggerAutoRelayout() {
+        const nodes = getFilteredNodes();
+        const nodeIds = new Set(nodes.map((node) => node.id));
+        const baseLayout = buildBaseLayout(nodes);
+        state.layoutSeed += 1;
+
+        nodes.forEach((node, index) => {
+          if (state.fixedNodes.has(node.id) || state.dragging?.nodeId === node.id) return;
+          const base = baseLayout.positions.get(node.id);
+          const bounds = baseLayout.bounds.get(node.id);
+          if (!base || !bounds) return;
+          const jitter = getSeededJitter(`${node.id}-${state.layoutSeed}-${index}`);
+          state.positions.set(node.id, clampPoint({
+            x: base.x + jitter.x * 64,
+            y: base.y + jitter.y * 52
+          }, bounds));
+        });
+
+        [...state.positions.keys()].forEach((nodeId) => {
+          if (!nodeIds.has(nodeId)) state.positions.delete(nodeId);
+        });
+
+        renderAll();
+      }
+
+      function showTooltip(nodeId, event) {
+        state.tooltip.nodeId = nodeId;
+        state.tooltip.visible = true;
+        updateTooltipPosition(event);
+        renderTooltip();
+      }
+
+      function updateTooltipPosition(event) {
+        if (!event || !el.graphStage) return;
+        const rect = el.graphStage.getBoundingClientRect();
+        state.tooltip.x = Math.max(16, Math.min(rect.width - 32, event.clientX - rect.left + 14));
+        state.tooltip.y = Math.max(16, Math.min(rect.height - 32, event.clientY - rect.top + 14));
+      }
+
+      function hideTooltip() {
+        state.tooltip.visible = false;
+        state.tooltip.nodeId = null;
+        renderTooltip();
+      }
+
+      function renderTooltip() {
+        const node = state.tooltip.nodeId ? state.data?.nodeMap.get(state.tooltip.nodeId) : null;
+        if (!state.tooltip.visible || !node) {
+          el.graphTooltip.classList.remove('visible');
+          el.graphTooltip.innerHTML = '';
+          return;
+        }
+
+        const isFixed = state.fixedNodes.has(node.id);
+        el.graphTooltip.innerHTML = `
+          <strong>${getNodeDisplayName(node)}</strong>
+          <div class="hint">${TYPE_LABELS[node.type]}${node.domain ? ` · ${node.domain}` : ''}${isFixed ? ' · 已固定' : ''}</div>
+          <p>${(node.summary || '暂无摘要').slice(0, 96)}${(node.summary || '').length > 96 ? '…' : ''}</p>
+        `;
+        el.graphTooltip.style.left = `${state.tooltip.x}px`;
+        el.graphTooltip.style.top = `${state.tooltip.y}px`;
+        el.graphTooltip.classList.add('visible');
       }
 
       function getNodeRadius(type) {
@@ -1187,17 +2282,20 @@
       }
 
       function isEdgeActive(edge) {
-        return Boolean(state.selectedNodeId && (edge.source === state.selectedNodeId || edge.target === state.selectedNodeId));
+        const focusNodeId = getFocusNodeId();
+        return Boolean(focusNodeId && (edge.source === focusNodeId || edge.target === focusNodeId));
       }
 
       function isGraphDimmed(edge) {
-        if (!state.selectedNodeId) return false;
-        return !(edge.source === state.selectedNodeId || edge.target === state.selectedNodeId);
+        const focusNodeId = getFocusNodeId();
+        if (!focusNodeId) return false;
+        return !(edge.source === focusNodeId || edge.target === focusNodeId);
       }
 
       function isNodeDimmed(nodeId, selectedNeighbors) {
-        if (!state.selectedNodeId) return false;
-        return nodeId !== state.selectedNodeId && !selectedNeighbors.has(nodeId);
+        const focusNodeId = getFocusNodeId();
+        if (!focusNodeId) return false;
+        return nodeId !== focusNodeId && !selectedNeighbors.has(nodeId);
       }
 
       function stageKey(track, stage) {
@@ -1214,8 +2312,8 @@
       function getSvgPoint(event) {
         const rect = el.graphSvg.getBoundingClientRect();
         return {
-          x: Math.max(24, Math.min(1156, ((event.clientX - rect.left) / rect.width) * 1180)),
-          y: Math.max(24, Math.min(736, ((event.clientY - rect.top) / rect.height) * 760))
+          x: Math.max(24, Math.min(GRAPH_WIDTH - 24, ((event.clientX - rect.left) / rect.width) * GRAPH_WIDTH)),
+          y: Math.max(24, Math.min(GRAPH_HEIGHT - 24, ((event.clientY - rect.top) / rect.height) * GRAPH_HEIGHT))
         };
       }
     </script>

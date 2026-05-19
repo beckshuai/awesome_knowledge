@@ -214,5 +214,72 @@
     { "year": "1960s-1970s", "title": "科斯、货币主义与公共选择", "node": "school_chicago", "summary": "交易成本、产权、货币供给和政府失灵成为重要议题。" },
     { "year": "1970s-1990s", "title": "信息、博弈与行为", "node": "era_modern", "summary": "理性人模型被信息约束、策略互动和心理偏差扩展。" },
     { "year": "2000s-至今", "title": "实验、制度、危机与不平等", "node": "concept_institutions", "summary": "随机实验、长期制度、金融稳定、创新增长和分配问题成为焦点。" }
+  ],
+  "practical_guides": [
+    {
+      "id": "practice_budget_review",
+      "title": "每周做一次机会成本复盘",
+      "scenario": "适合个人时间管理、消费决策和团队排期。",
+      "habit": "把“做了什么”改成“因此放弃了什么”，用机会成本替代模糊忙碌感。",
+      "steps": [
+        "每周挑 3 项最花时间或最花钱的决定。",
+        "分别写下：我得到什么、我放弃什么、下周是否继续。",
+        "保留真正高回报事项，删除低价值消耗。"
+      ],
+      "daily_use": "能用于预算、排期、选项目、下班后时间分配，减少“看起来努力，实际低效”。",
+      "related_nodes": ["concept_scarcity", "concept_comparative", "person_ricardo"]
+    },
+    {
+      "id": "practice_price_signal",
+      "title": "遇到缺货或拥堵时先看激励，而不只怪执行",
+      "scenario": "适合分析家庭分工、团队协作、资源排队和流程堵点。",
+      "habit": "当某件事总是没人做、总是延迟、总是拥堵时，先检查激励和价格信号是否错位。",
+      "steps": [
+        "先列出谁承担成本、谁获得收益。",
+        "再看当前规则是否让关键行为“吃亏”。",
+        "调整分工、奖励或默认设置，再观察结果。"
+      ],
+      "daily_use": "适用于家务分配、团队值班、会议安排、报销流程和客户响应机制。",
+      "related_nodes": ["concept_invisible", "concept_externality", "person_smith", "person_coase"]
+    },
+    {
+      "id": "practice_nudge_default",
+      "title": "把好选择变成默认选项",
+      "scenario": "适合培养储蓄、阅读、运动、信息输入和团队协作习惯。",
+      "habit": "不要只靠意志力，优先改默认值、入口和环境。",
+      "steps": [
+        "把最重要的一件事放到最容易开始的位置。",
+        "减少坏选择的摩擦，把好选择变成一键可执行。",
+        "每周只改一个默认设置，例如自动转账、固定学习时段或会议模板。"
+      ],
+      "daily_use": "可用于个人理财、健康习惯、知识管理，也适合产品设计和团队流程优化。",
+      "related_nodes": ["concept_nudge", "concept_prospect", "person_thaler", "person_kahneman"]
+    },
+    {
+      "id": "practice_small_experiment",
+      "title": "先做小实验，再做大决策",
+      "scenario": "适合试新制度、换工具、做管理改动或家庭教育策略调整。",
+      "habit": "遇到争议时，不直接做长期承诺，而是先设一个可比较的小范围实验。",
+      "steps": [
+        "明确一个可观察指标，如完成率、等待时间、冲突次数。",
+        "先在 1 周或 1 个小组内测试一种做法。",
+        "用结果而不是感觉决定是否推广。"
+      ],
+      "daily_use": "适用于团队流程改进、学习方法比较、育儿规则试行和生活习惯调整。",
+      "related_nodes": ["concept_rct", "person_duflo", "school_development"]
+    },
+    {
+      "id": "practice_institution_design",
+      "title": "先搭规则，再期待自觉",
+      "scenario": "适合长期协作、公共资源使用、家庭共识和组织治理。",
+      "habit": "重复出现的冲突，不要每次临场劝说，而要建立可重复执行的规则。",
+      "steps": [
+        "先明确什么资源最容易被过度使用或推诿。",
+        "写下简单规则：谁负责、何时检查、出了问题怎么修正。",
+        "定期复盘规则是否过松或过严。"
+      ],
+      "daily_use": "适用于公共文档维护、共享空间管理、家庭消费规则和跨团队协作。",
+      "related_nodes": ["concept_commons", "concept_institutions", "concept_transaction", "person_ostrom", "person_acemoglu", "person_coase"]
+    }
   ]
 }

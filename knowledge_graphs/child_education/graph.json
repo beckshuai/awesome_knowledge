@@ -812,5 +812,77 @@
     "重视父亲、祖辈、照护者与社区，建立多成人支持网络。",
     "在日常生活中训练执行功能：等待、计划、切换、坚持、完成任务。",
     "用高频、温暖、来回互动的语言环境支持脑发育和语言学习。"
+  ],
+  "practical_guides": [
+    {
+      "id": "practice_child_observe_one_step",
+      "domain": "心理学",
+      "title": "每天做一次“多给一步”的支持",
+      "scenario": "适合家庭辅导、带娃做事、教学设计或团队带新人时使用。",
+      "habit": "先观察对方已经能独立完成到哪一步，再只补最小必要帮助，不要一次性全代劳。",
+      "steps": [
+        "先让孩子/学习者自己尝试 30-90 秒。",
+        "只指出下一步，而不是直接给完整答案。",
+        "完成后马上撤掉提示，看看是否能独立复现。"
+      ],
+      "daily_use": "可用于写作业、收玩具、穿衣、阅读、做家务，也可用于工作中的带教和 mentoring。",
+      "related_nodes": ["concept_zpd", "concept_scaffolding", "person_vygotsky"]
+    },
+    {
+      "id": "practice_child_secure_connection",
+      "domain": "心理学",
+      "title": "建立 10 分钟高质量陪伴锚点",
+      "scenario": "适合忙碌家庭或高压工作日，帮助稳定关系与情绪。",
+      "habit": "每天固定一个 10 分钟时段，专注回应、不讲道理、不刷手机，只做跟随式互动。",
+      "steps": [
+        "选一个固定时段，如晚饭后或睡前。",
+        "由孩子决定玩什么或聊什么，大人只跟随和回应。",
+        "优先做眼神、语言、动作上的及时反馈。"
+      ],
+      "daily_use": "能降低反复冲突，增强安全感，让孩子更愿意表达，也适合亲密关系和团队沟通中的“先连接后解决”。",
+      "related_nodes": ["concept_attachment", "concept_sensitive_care", "person_bowlby", "person_ainsworth"]
+    },
+    {
+      "id": "practice_child_name_and_switch",
+      "domain": "脑科学",
+      "title": "把执行功能训练嵌入日常小任务",
+      "scenario": "适合提升孩子的等待、切换、计划和自控能力。",
+      "habit": "不要只说“专心点”，而是把任务拆成等待、记住、切换、完成几个可练习动作。",
+      "steps": [
+        "每天挑一个场景练习：排队、收拾书包、餐前准备或睡前整理。",
+        "一次只练一个目标，如“先停 5 秒再行动”。",
+        "完成后复盘：刚才哪里最难，下次怎么做更顺。"
+      ],
+      "daily_use": "可迁移到课堂纪律、时间管理、运动训练和成年人自我管理。",
+      "related_nodes": ["concept_exec_function", "person_diamond", "concept_brain_architecture"]
+    },
+    {
+      "id": "practice_child_serve_return",
+      "domain": "脑科学",
+      "title": "用“来回一轮”提升语言与关系质量",
+      "scenario": "适合婴幼儿互动、低龄儿童沟通，也适合工作中的倾听训练。",
+      "habit": "每次交流都至少完成一轮“对方发出信号—我回应—对方再回应”的来回互动。",
+      "steps": [
+        "先观察对方看向什么、指向什么、在意什么。",
+        "用简短语言描述并回应，不急于提问或纠正。",
+        "等待对方继续接球，再补一句扩展表达。"
+      ],
+      "daily_use": "有助于语言发展、情绪稳定和理解他人，也能提升会议沟通中的倾听质量。",
+      "related_nodes": ["concept_serve_return", "concept_early_language", "person_kuhl"]
+    },
+    {
+      "id": "practice_child_context_first",
+      "domain": "人类学",
+      "title": "先看情境，再评价行为",
+      "scenario": "适合处理“为什么别人家孩子不一样”“为什么这个方法没用”这类困惑。",
+      "habit": "遇到孩子表现差异时，先问文化、资源、家庭结构、照护者网络和生活节奏，而不是先贴标签。",
+      "steps": [
+        "先列出当前情境：谁在照护、时间怎么安排、规则是否一致。",
+        "再判断行为背后是能力问题、关系问题还是环境问题。",
+        "优先调整环境和支持网络，再谈要求升级。"
+      ],
+      "daily_use": "能减少简单归因，也适合团队管理、跨文化协作和组织诊断。",
+      "related_nodes": ["concept_cultural_learning", "concept_guided_participation", "concept_cooperative_breeding", "person_rogoff", "person_hrdy"]
+    }
   ]
 }
