@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>awesome_knowledge · 知识图谱导航站</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: rgba(18, 26, 47, 0.88);
+        --line: rgba(148, 163, 184, 0.18);
+        --text: #e7eefc;
+        --muted: #9eb0cf;
+        --blue: #4ea1ff;
+        --green: #46d6a9;
+        --orange: #ffb454;
+        --shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #16254a, var(--bg) 42%);
+        color: var(--text);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 28px 20px 48px;
+      }
+
+      .hero {
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(78, 161, 255, 0.16), rgba(176, 132, 255, 0.08));
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(78, 161, 255, 0.14);
+        color: #d9e8ff;
+        font-size: 12px;
+      }
+
+      h1 {
+        margin: 14px 0 10px;
+        font-size: 38px;
+        line-height: 1.15;
+      }
+
+      .hero p {
+        margin: 0;
+        color: #c7d6ef;
+        line-height: 1.8;
+        max-width: 900px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(18, 26, 47, 0.86);
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .btn.primary {
+        background: rgba(78, 161, 255, 0.2);
+        border-color: rgba(78, 161, 255, 0.45);
+      }
+
+      .section {
+        margin-top: 22px;
+      }
+
+      .section-title {
+        margin: 0 0 14px;
+        font-size: 20px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card,
+      .mini-card,
+      .code-box {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: #d8e8ff;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        display: inline-block;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .card p {
+        margin: 12px 0 0;
+        color: #bfd0ee;
+        line-height: 1.7;
+      }
+
+      .features {
+        margin: 16px 0 0;
+        padding: 0 0 0 18px;
+        color: #dce8ff;
+        line-height: 1.8;
+      }
+
+      .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .mini-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .mini-card {
+        padding: 18px;
+      }
+
+      .mini-card h4 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .mini-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .code-box {
+        padding: 18px;
+      }
+
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      pre {
+        margin: 10px 0 0;
+        padding: 14px;
+        overflow: auto;
+        border-radius: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(12, 18, 34, 0.95);
+        color: #dce8ff;
+        line-height: 1.7;
+      }
+
+      .footer {
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+      }
+
+      @media (max-width: 900px) {
+        .grid,
+        .mini-grid {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <span class="eyebrow">awesome_knowledge · 总导航站点</span>
+        <h1>知识图谱统一入口</h1>
+        <p>
+          这里是仓库首页，也是 GitHub Pages 的统一导航站点。你可以从这里进入已经完成的交互式图谱页面，分别查看知识图谱、发展轨迹和关联关系。当前已收录两个主题：孩子教育、经济学。
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="./knowledge_graphs/child_education/">进入孩子教育图谱</a>
+          <a class="btn" href="./knowledge_graphs/economics/">进入经济学图谱</a>
+          <a class="btn" href="https://github.com/beckshuai/awesome_knowledge" target="_blank" rel="noreferrer">查看 GitHub 仓库</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">图谱入口</h2>
+        <div class="grid">
+          <article class="card">
+            <div class="tag-row">
+              <span class="tag"><span class="dot" style="background: var(--blue)"></span>心理学</span>
+              <span class="tag"><span class="dot" style="background: var(--green)"></span>人类学</span>
+              <span class="tag"><span class="dot" style="background: var(--orange)"></span>脑科学</span>
+            </div>
+            <h3>孩子教育知识图谱</h3>
+            <p>
+              聚焦儿童教育与养育，覆盖主动建构学习、最近发展区、依恋、合作抚育、执行功能、脑可塑性等核心主题。
+            </p>
+            <ul class="features">
+              <li>交互式知识图谱</li>
+              <li>心理学 / 人类学 / 脑科学发展轨迹</li>
+              <li>节点间关联关系浏览</li>
+            </ul>
+            <div class="card-actions">
+              <a class="btn primary" href="./knowledge_graphs/child_education/">打开图谱</a>
+              <a class="btn" href="./knowledge_graphs/child_education/graph.json">查看数据</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="tag-row">
+              <span class="tag"><span class="dot" style="background: #f59e0b"></span>思想史</span>
+              <span class="tag"><span class="dot" style="background: #a78bfa"></span>学派</span>
+              <span class="tag"><span class="dot" style="background: #fb7185"></span>人物与著作</span>
+            </div>
+            <h3>经济学知识图谱</h3>
+            <p>
+              聚焦经济学思想演化、主要学派、关键人物、概念与著作，支持用交互方式查看历史脉络和方法关系。
+            </p>
+            <ul class="features">
+              <li>学派 / 人物 / 概念关系网络</li>
+              <li>思想史时间线</li>
+              <li>关联矩阵与细节说明</li>
+            </ul>
+            <div class="card-actions">
+              <a class="btn primary" href="./knowledge_graphs/economics/">打开图谱</a>
+              <a class="btn" href="./knowledge_graphs/economics/graph.json">查看数据</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">访问方式</h2>
+        <div class="mini-grid">
+          <div class="mini-card">
+            <h4>GitHub Pages 在线访问</h4>
+            <p>
+              启用 Pages 后，可以直接访问仓库首页站点，并从首页进入两个主题图谱。如果 Pages 发布成功，项目地址将是：<code>https://beckshuai.github.io/awesome_knowledge/</code>
+            </p>
+          </div>
+          <div class="mini-card">
+            <h4>本地浏览器预览</h4>
+            <p>
+              推荐通过本地静态服务器打开，而不是直接双击 HTML。因为页面内部通过 <code>fetch</code> 加载 JSON 数据，需要 HTTP 访问环境。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">本地运行示例</h2>
+        <div class="code-box">
+          <div>在仓库根目录执行：</div>
+          <pre>cd "/Users/bytedance/repos/github/awesome_knowledge"
+python3 -m http.server 8000</pre>
+          <div style="margin-top: 12px; color: var(--muted); line-height: 1.7;">
+            然后在浏览器打开：<code>http://localhost:8000</code>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        awesome_knowledge · GitHub Pages / 本地浏览器统一入口
+      </div>
+    </div>
+  </body>
+</html>
