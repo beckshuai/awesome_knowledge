@@ -1,0 +1,235 @@
+{
+  "metadata": {
+    "title": "awesome_knowledge 目录索引",
+    "description": "统一维护总站中已上线图谱、未来图谱目录、站点统计与更新日志。",
+    "updated_at": "2026-05-19",
+    "pages_url": "https://beckshuai.github.io/awesome_knowledge/",
+    "repo_url": "https://github.com/beckshuai/awesome_knowledge"
+  },
+  "live_topics": [
+    {
+      "slug": "child_education",
+      "title": "孩子教育知识图谱",
+      "status": "已上线",
+      "categories": [
+        "教育",
+        "社会科学",
+        "已上线"
+      ],
+      "tags": [
+        "心理学",
+        "人类学",
+        "脑科学"
+      ],
+      "search_terms": [
+        "孩子教育",
+        "儿童教育",
+        "心理学",
+        "人类学",
+        "脑科学",
+        "养育",
+        "依恋",
+        "执行功能"
+      ],
+      "description": "聚焦儿童教育与养育，覆盖主动建构学习、最近发展区、依恋、安全感、合作抚育、执行功能、脑可塑性等核心主题。",
+      "features": [
+        "交互式知识图谱",
+        "心理学 / 人类学 / 脑科学发展轨迹",
+        "节点间关联关系浏览"
+      ],
+      "path": "./knowledge_graphs/child_education/",
+      "data_path": "./knowledge_graphs/child_education/graph.json"
+    },
+    {
+      "slug": "economics",
+      "title": "经济学知识图谱",
+      "status": "已上线",
+      "categories": [
+        "社会科学",
+        "已上线"
+      ],
+      "tags": [
+        "思想史",
+        "学派",
+        "人物与著作"
+      ],
+      "search_terms": [
+        "经济学",
+        "思想史",
+        "学派",
+        "人物",
+        "概念",
+        "著作",
+        "行为经济学",
+        "制度经济学",
+        "凯恩斯"
+      ],
+      "description": "聚焦经济学思想演化、主要学派、关键人物、概念与著作，支持用交互方式查看历史脉络、理论关系和方法转向。",
+      "features": [
+        "学派 / 人物 / 概念关系网络",
+        "思想史时间线",
+        "关联矩阵与细节说明"
+      ],
+      "path": "./knowledge_graphs/economics/",
+      "data_path": "./knowledge_graphs/economics/graph.json"
+    }
+  ],
+  "future_topics": [
+    {
+      "slug": "learning_science",
+      "title": "学习科学知识图谱",
+      "status": "规划中",
+      "categories": [
+        "规划中",
+        "教育"
+      ],
+      "tags": [
+        "教育",
+        "学习科学"
+      ],
+      "search_terms": [
+        "学习科学",
+        "认知科学",
+        "元认知",
+        "教学设计",
+        "课堂学习"
+      ],
+      "description": "聚焦有效学习、认知负荷、元认知、练习设计、反馈机制与课堂应用。",
+      "ideas": [
+        "认知科学与教学设计的连接",
+        "学习策略与实践方法映射",
+        "适合和孩子教育图谱形成互补"
+      ],
+      "path": "./knowledge_graphs/learning_science/",
+      "status_style": "planned"
+    },
+    {
+      "slug": "family_socialization",
+      "title": "家庭与社会化知识图谱",
+      "status": "调研中",
+      "categories": [
+        "规划中",
+        "社会科学"
+      ],
+      "tags": [
+        "社会科学",
+        "家庭社会学"
+      ],
+      "search_terms": [
+        "社会学",
+        "家庭",
+        "代际关系",
+        "教育分层",
+        "阶层流动"
+      ],
+      "description": "聚焦家庭结构、代际关系、社会化机制、教育分层与文化资本。",
+      "ideas": [
+        "补足孩子教育图谱里的社会结构视角",
+        "适合与人类学、教育学内容联动",
+        "可形成跨学科家庭教育地图"
+      ],
+      "path": "./knowledge_graphs/family_socialization/",
+      "status_style": "researching"
+    },
+    {
+      "slug": "ai_knowledge_representation",
+      "title": "AI 与知识表示图谱",
+      "status": "规划中",
+      "categories": [
+        "规划中",
+        "技术"
+      ],
+      "tags": [
+        "技术",
+        "人工智能"
+      ],
+      "search_terms": [
+        "AI",
+        "人工智能",
+        "机器学习",
+        "大模型",
+        "agent",
+        "知识表示"
+      ],
+      "description": "聚焦大模型、Agent、知识表示、推理链条和人机协作。",
+      "ideas": [
+        "适合作为技术主题主入口",
+        "可扩展到工具链、提示工程、评测",
+        "与当前知识图谱工程方法可复用"
+      ],
+      "path": "./knowledge_graphs/ai_knowledge_representation/",
+      "status_style": "planned"
+    },
+    {
+      "slug": "philosophy_education",
+      "title": "哲学与教育观知识图谱",
+      "status": "规划中",
+      "categories": [
+        "规划中",
+        "人文"
+      ],
+      "tags": [
+        "人文",
+        "哲学"
+      ],
+      "search_terms": [
+        "哲学",
+        "伦理学",
+        "认知哲学",
+        "教育哲学",
+        "美德",
+        "幸福"
+      ],
+      "description": "聚焦教育哲学、伦理学、人格成长、自由与纪律、幸福与德性。",
+      "ideas": [
+        "帮助把方法延伸到价值观层面",
+        "可与孩子教育主题深度联动",
+        "适合做长期知识沉淀"
+      ],
+      "path": "./knowledge_graphs/philosophy_education/",
+      "status_style": "planned"
+    }
+  ],
+  "metrics": [
+    {
+      "title": "主题覆盖",
+      "description": "当前站点已经形成已上线内容 + 未来目录的双层结构。",
+      "value": "6"
+    },
+    {
+      "title": "已上线图谱",
+      "description": "可以直接交互访问并支持数据浏览的图谱页面数量。",
+      "value": "2"
+    },
+    {
+      "title": "规划中主题",
+      "description": "已进入目录管理、可继续扩展为正式图谱页面的主题数量。",
+      "value": "4"
+    },
+    {
+      "title": "访问模式",
+      "description": "支持 GitHub Pages 在线访问，也支持本地静态服务器统一预览。",
+      "value": "Pages + Local"
+    }
+  ],
+  "updates": {
+    "latest": {
+      "date": "2026-05-19",
+      "title": "最近更新",
+      "items": [
+        "新增首页搜索、分类筛选和实时预览",
+        "新增未来图谱目录",
+        "README 改为正式项目入口说明"
+      ]
+    },
+    "next": {
+      "date": "建议的后续路线",
+      "title": "下一阶段建议",
+      "items": [
+        "为未来图谱逐个填充结构化数据",
+        "增加总站级的全文搜索",
+        "形成跨主题知识链接"
+      ]
+    }
+  }
+}

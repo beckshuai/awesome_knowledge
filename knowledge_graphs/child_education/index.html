@@ -198,6 +198,8 @@
       #graphSvg {
         width: 100%;
         height: 760px;
+        touch-action: none;
+        user-select: none;
         border-radius: 16px;
         background: linear-gradient(180deg, rgba(12, 18, 34, 0.95), rgba(18, 26, 47, 0.95));
         border: 1px solid rgba(148, 163, 184, 0.12);
@@ -226,8 +228,12 @@
       }
 
       .node {
-        cursor: pointer;
+        cursor: grab;
         transition: 0.2s ease;
+      }
+
+      .node:active {
+        cursor: grabbing;
       }
 
       .node circle {
@@ -633,6 +639,9 @@
         selectedNodeId: null,
         selectedStage: null,
         currentTab: 'graph',
+        positions: new Map(),
+        dragging: null,
+        didDrag: false,
         filters: {
           search: '',
           domain: '全部',
@@ -717,6 +726,27 @@
           document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
           document.getElementById(`view-${state.currentTab}`).classList.add('active');
           renderDetailPanel();
+        });
+
+        el.graphSvg.addEventListener('pointermove', (event) => {
+          if (!state.dragging) return;
+          const point = getSvgPoint(event);
+          state.positions.set(state.dragging.nodeId, point);
+          state.didDrag = true;
+          renderGraph();
+        });
+
+        el.graphSvg.addEventListener('pointerup', (event) => {
+          if (state.dragging) {
+            try { el.graphSvg.releasePointerCapture(event.pointerId); } catch (_) {}
+          }
+          state.dragging = null;
+          setTimeout(() => { state.didDrag = false; }, 0);
+        });
+
+        el.graphSvg.addEventListener('pointercancel', () => {
+          state.dragging = null;
+          state.didDrag = false;
         });
       }
 
@@ -838,7 +868,11 @@
             bucket.forEach((node, index) => {
               const x = xCenter + ((index % 2 === 0 ? -1 : 1) * Math.min(42, Math.floor(index / 2) * 14));
               const y = startY + index * spacing;
-              positionMap.set(node.id, { x, y });
+              const defaultPosition = { x, y };
+              if (!state.positions.has(node.id)) {
+                state.positions.set(node.id, defaultPosition);
+              }
+              positionMap.set(node.id, state.positions.get(node.id));
             });
           });
         });
@@ -888,7 +922,16 @@
           const label = createSvg('text', { y: radius + 16 }, getNodeLabel(node));
           g.appendChild(circle);
           g.appendChild(label);
+          g.addEventListener('pointerdown', (event) => {
+            state.dragging = { nodeId: node.id };
+            state.didDrag = false;
+            const current = positionMap.get(node.id);
+            state.positions.set(node.id, { x: current.x, y: current.y });
+            el.graphSvg.setPointerCapture(event.pointerId);
+            event.preventDefault();
+          });
           g.addEventListener('click', () => {
+            if (state.didDrag) return;
             state.selectedNodeId = node.id;
             state.selectedStage = null;
             renderAll();
@@ -1166,6 +1209,14 @@
         Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
         if (text) element.textContent = text;
         return element;
+      }
+
+      function getSvgPoint(event) {
+        const rect = el.graphSvg.getBoundingClientRect();
+        return {
+          x: Math.max(24, Math.min(1156, ((event.clientX - rect.left) / rect.width) * 1180)),
+          y: Math.max(24, Math.min(736, ((event.clientY - rect.top) / rect.height) * 760))
+        };
       }
     </script>
   </body>

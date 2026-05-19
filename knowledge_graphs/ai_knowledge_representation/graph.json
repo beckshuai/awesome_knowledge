@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "title": "AI 与知识表示图谱",
+    "topic": "人工智能 / 知识表示 / Agent / 推理",
+    "status": "template",
+    "language": "zh-CN",
+    "created_at": "2026-05-19",
+    "description": "未来图谱模板：用于后续补充大模型、知识表示、RAG、Agent、推理与工具协作等内容。"
+  },
+  "nodes": [],
+  "edges": [],
+  "development_tracks": [],
+  "domain_overviews": {},
+  "practical_implications": [],
+  "template_notes": [
+    "后续可补充大模型、RAG、知识图谱、Agent、评测、提示工程等主题。",
+    "建议发展为技术主题总站并复用当前图谱工程方法。"
+  ]
+}

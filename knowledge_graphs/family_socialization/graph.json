@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "title": "家庭与社会化知识图谱",
+    "topic": "家庭社会学 / 社会化 / 代际关系",
+    "status": "template",
+    "language": "zh-CN",
+    "created_at": "2026-05-19",
+    "description": "未来图谱模板：用于后续补充家庭结构、代际关系、社会化机制、教育分层与文化资本。"
+  },
+  "nodes": [],
+  "edges": [],
+  "development_tracks": [],
+  "domain_overviews": {},
+  "practical_implications": [],
+  "template_notes": [
+    "后续可补充家庭结构、教育分层、代际传递、文化资本、同伴影响等主题。",
+    "建议与孩子教育知识图谱、人类学与教育学视角打通。"
+  ]
+}

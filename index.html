@@ -50,10 +50,11 @@
       .hero,
       .panel,
       .graph-card,
-      .preview-card,
       .feature-card,
       .future-card,
-      .code-box {
+      .code-box,
+      .metric-card,
+      .update-card {
         border: 1px solid var(--line);
         border-radius: 24px;
         background: var(--panel);
@@ -91,7 +92,8 @@
       .hero-actions,
       .card-actions,
       .filter-row,
-      .section-head {
+      .section-head,
+      .future-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
@@ -101,11 +103,21 @@
         margin-top: 18px;
       }
 
-      .hero-stats {
+      .hero-stats,
+      .cards-grid,
+      .metrics-grid,
+      .update-grid,
+      .info-grid,
+      .future-grid {
         display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .hero-stats {
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
         margin-top: 18px;
+        gap: 12px;
       }
 
       .stat {
@@ -177,8 +189,13 @@
         max-width: 760px;
       }
 
-      .toolbar {
-        padding: 18px;
+      .toolbar,
+      .feature-card,
+      .future-card,
+      .code-box,
+      .metric-card,
+      .update-card {
+        padding: 20px;
       }
 
       .filter-row {
@@ -222,12 +239,6 @@
         font-size: 13px;
       }
 
-      .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-      }
-
       .graph-card {
         overflow: hidden;
       }
@@ -240,15 +251,13 @@
       }
 
       .preview-frame iframe {
-        width: 100%;
-        height: 100%;
+        width: calc(100% / 0.86);
+        height: calc(100% / 0.86);
         border: none;
         background: #0b1020;
         pointer-events: none;
         transform: scale(0.86);
         transform-origin: top left;
-        width: calc(100% / 0.86);
-        height: calc(100% / 0.86);
       }
 
       .preview-mask {
@@ -261,7 +270,8 @@
         padding: 20px;
       }
 
-      .tag-row {
+      .tag-row,
+      .future-meta {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
@@ -310,88 +320,38 @@
 
       .graph-card p,
       .future-card p,
-      .feature-card p {
+      .feature-card p,
+      .metric-card p,
+      .update-card p {
         margin: 12px 0 0;
         color: #bfd0ee;
         line-height: 1.74;
       }
 
-      .features {
-        margin: 16px 0 0;
-        padding: 0 0 0 18px;
+      .features,
+      .future-list,
+      .update-list {
+        margin: 14px 0 0;
+        padding-left: 18px;
         color: #dce8ff;
         line-height: 1.86;
       }
 
-      .card-actions {
-        margin-top: 18px;
-      }
-
-      .hidden {
-        display: none !important;
-      }
-
-      .info-grid,
-      .future-grid,
-      .metrics-grid,
-      .update-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      .feature-card,
-      .future-card,
-      .code-box {
-        padding: 20px;
-      }
-
-      .feature-card h4 {
-        margin: 0 0 10px;
-        font-size: 17px;
-      }
-
-      .future-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 12px;
-      }
-
-      .future-list {
-        margin: 14px 0 0;
-        padding-left: 18px;
-        color: #dce8ff;
-        line-height: 1.8;
-      }
-
+      .card-actions,
       .future-actions {
-        margin-top: 16px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        margin-top: 18px;
       }
 
       .metric-card,
       .update-card {
-        padding: 20px;
-        border: 1px solid var(--line);
-        border-radius: 22px;
         background: var(--panel-2);
-        box-shadow: var(--shadow);
       }
 
       .metric-card h4,
+      .feature-card h4,
       .update-card h4 {
         margin: 0 0 10px;
         font-size: 17px;
-      }
-
-      .metric-card p,
-      .update-card p {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.72;
       }
 
       .metric-number {
@@ -407,11 +367,17 @@
         font-size: 12px;
       }
 
-      .update-list {
-        margin: 12px 0 0;
-        padding-left: 18px;
-        color: #dce8ff;
-        line-height: 1.8;
+      .empty-state {
+        padding: 28px;
+        text-align: center;
+        color: var(--muted);
+        border: 1px dashed rgba(148, 163, 184, 0.24);
+        border-radius: 20px;
+        background: rgba(12, 19, 35, 0.5);
+      }
+
+      .hidden {
+        display: none !important;
       }
 
       code,
@@ -430,15 +396,6 @@
         line-height: 1.72;
       }
 
-      .empty-state {
-        padding: 28px;
-        text-align: center;
-        color: var(--muted);
-        border: 1px dashed rgba(148, 163, 184, 0.24);
-        border-radius: 20px;
-        background: rgba(12, 19, 35, 0.5);
-      }
-
       .footer {
         margin-top: 28px;
         color: var(--muted);
@@ -448,10 +405,10 @@
 
       @media (max-width: 1080px) {
         .cards-grid,
-        .info-grid,
-        .future-grid,
         .metrics-grid,
         .update-grid,
+        .info-grid,
+        .future-grid,
         .hero-stats {
           grid-template-columns: 1fr;
         }
@@ -471,7 +428,9 @@
         .graph-card,
         .feature-card,
         .future-card,
-        .code-box {
+        .code-box,
+        .metric-card,
+        .update-card {
           border-radius: 18px;
         }
 
@@ -495,24 +454,7 @@
           <a class="btn" href="https://beckshuai.github.io/awesome_knowledge/" target="_blank" rel="noreferrer">打开 GitHub Pages</a>
           <a class="btn" href="https://github.com/beckshuai/awesome_knowledge" target="_blank" rel="noreferrer">查看 GitHub 仓库</a>
         </div>
-        <div class="hero-stats">
-          <div class="stat">
-            <div class="stat-label">已上线图谱</div>
-            <div class="stat-value">2</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">规划中主题</div>
-            <div class="stat-value">4</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">访问入口</div>
-            <div class="stat-value">Pages / 本地</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">当前模式</div>
-            <div class="stat-value">可交互导航</div>
-          </div>
-        </div>
+        <div class="hero-stats" id="heroStats"></div>
       </section>
 
       <section class="section panel toolbar" id="live-graphs">
@@ -534,77 +476,11 @@
           <button class="filter-chip" data-filter="已上线">已上线</button>
           <button class="filter-chip" data-filter="规划中">规划中</button>
         </div>
-        <div class="result-count" id="resultCount">当前共显示 2 个已上线图谱</div>
+        <div class="result-count" id="resultCount">正在加载目录数据…</div>
       </section>
 
       <section class="section">
-        <div class="cards-grid" id="graphGrid">
-          <article
-            class="graph-card graph-item"
-            data-kind="live"
-            data-category="教育 社会科学 已上线"
-            data-search="孩子教育 儿童教育 心理学 人类学 脑科学 养育 依恋 执行功能"
-          >
-            <div class="preview-frame">
-              <iframe src="./knowledge_graphs/child_education/" title="孩子教育知识图谱预览"></iframe>
-              <div class="preview-mask"></div>
-            </div>
-            <div class="card-content">
-              <div class="tag-row">
-                <span class="status live">已上线</span>
-                <span class="tag"><span class="dot" style="background: var(--blue)"></span>心理学</span>
-                <span class="tag"><span class="dot" style="background: var(--green)"></span>人类学</span>
-                <span class="tag"><span class="dot" style="background: var(--orange)"></span>脑科学</span>
-              </div>
-              <h3>孩子教育知识图谱</h3>
-              <p>
-                聚焦儿童教育与养育，覆盖主动建构学习、最近发展区、依恋、安全感、合作抚育、执行功能、脑可塑性等核心主题。
-              </p>
-              <ul class="features">
-                <li>交互式知识图谱</li>
-                <li>心理学 / 人类学 / 脑科学发展轨迹</li>
-                <li>节点间关联关系浏览</li>
-              </ul>
-              <div class="card-actions">
-                <a class="btn primary" href="./knowledge_graphs/child_education/">打开图谱</a>
-                <a class="btn" href="./knowledge_graphs/child_education/graph.json">查看数据</a>
-              </div>
-            </div>
-          </article>
-
-          <article
-            class="graph-card graph-item"
-            data-kind="live"
-            data-category="社会科学 已上线"
-            data-search="经济学 思想史 学派 人物 概念 著作 行为经济学 制度经济学 凯恩斯"
-          >
-            <div class="preview-frame">
-              <iframe src="./knowledge_graphs/economics/" title="经济学知识图谱预览"></iframe>
-              <div class="preview-mask"></div>
-            </div>
-            <div class="card-content">
-              <div class="tag-row">
-                <span class="status live">已上线</span>
-                <span class="tag"><span class="dot" style="background: #f59e0b"></span>思想史</span>
-                <span class="tag"><span class="dot" style="background: var(--purple)"></span>学派</span>
-                <span class="tag"><span class="dot" style="background: var(--pink)"></span>人物与著作</span>
-              </div>
-              <h3>经济学知识图谱</h3>
-              <p>
-                聚焦经济学思想演化、主要学派、关键人物、概念与著作，支持用交互方式查看历史脉络、理论关系和方法转向。
-              </p>
-              <ul class="features">
-                <li>学派 / 人物 / 概念关系网络</li>
-                <li>思想史时间线</li>
-                <li>关联矩阵与细节说明</li>
-              </ul>
-              <div class="card-actions">
-                <a class="btn primary" href="./knowledge_graphs/economics/">打开图谱</a>
-                <a class="btn" href="./knowledge_graphs/economics/graph.json">查看数据</a>
-              </div>
-            </div>
-          </article>
-        </div>
+        <div class="cards-grid" id="graphGrid"></div>
         <div class="empty-state hidden" id="emptyState">当前筛选条件下没有匹配的图谱，请尝试更换关键词或分类。</div>
       </section>
 
@@ -615,48 +491,8 @@
             <div class="section-subtitle">首页新增一块运营视角区域，用来快速说明站点规模、当前进度和最近更新内容。</div>
           </div>
         </div>
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <h4>主题覆盖</h4>
-            <p>当前站点已经形成“已上线内容 + 未来目录”的双层结构。</p>
-            <div class="metric-number">6</div>
-          </div>
-          <div class="metric-card">
-            <h4>已上线图谱</h4>
-            <p>可以直接交互访问并支持数据浏览的图谱页面数量。</p>
-            <div class="metric-number">2</div>
-          </div>
-          <div class="metric-card">
-            <h4>规划中主题</h4>
-            <p>已进入目录管理、可继续扩展为正式图谱页面的主题数量。</p>
-            <div class="metric-number">4</div>
-          </div>
-          <div class="metric-card">
-            <h4>访问模式</h4>
-            <p>支持 GitHub Pages 在线访问，也支持本地静态服务器统一预览。</p>
-            <div class="metric-number">Pages + Local</div>
-          </div>
-        </div>
-        <div class="update-grid" style="margin-top: 16px;">
-          <div class="update-card">
-            <h4>最近更新</h4>
-            <div class="update-meta">2026-05-19</div>
-            <ul class="update-list">
-              <li>新增首页搜索、分类筛选和实时预览</li>
-              <li>新增未来图谱目录</li>
-              <li>README 改为正式项目入口说明</li>
-            </ul>
-          </div>
-          <div class="update-card">
-            <h4>下一阶段建议</h4>
-            <div class="update-meta">建议的后续路线</div>
-            <ul class="update-list">
-              <li>为未来图谱逐个填充结构化数据</li>
-              <li>增加总站级的全文搜索</li>
-              <li>形成跨主题知识链接</li>
-            </ul>
-          </div>
-        </div>
+        <div class="metrics-grid" id="metricsGrid"></div>
+        <div class="update-grid" id="updateGrid" style="margin-top: 16px;"></div>
       </section>
 
       <section class="section">
@@ -691,79 +527,7 @@
             </div>
           </div>
         </div>
-        <div class="future-grid" id="future-directory">
-          <article class="future-card graph-item" data-kind="future" data-category="规划中 教育" data-search="学习科学 认知科学 元认知 教学设计 课堂学习">
-            <div class="future-meta">
-              <span class="status planned">规划中</span>
-              <span class="tag">教育</span>
-              <span class="tag">学习科学</span>
-            </div>
-            <h3>学习科学知识图谱</h3>
-            <p>聚焦有效学习、认知负荷、元认知、练习设计、反馈机制与课堂应用。</p>
-            <ul class="future-list">
-              <li>认知科学与教学设计的连接</li>
-              <li>学习策略与实践方法映射</li>
-              <li>适合和孩子教育图谱形成互补</li>
-            </ul>
-            <div class="future-actions">
-              <a class="btn primary" href="./knowledge_graphs/learning_science/">打开模板页</a>
-            </div>
-          </article>
-
-          <article class="future-card graph-item" data-kind="future" data-category="规划中 社会科学" data-search="社会学 家庭 代际关系 教育分层 阶层流动">
-            <div class="future-meta">
-              <span class="status researching">调研中</span>
-              <span class="tag">社会科学</span>
-              <span class="tag">家庭社会学</span>
-            </div>
-            <h3>家庭与社会化知识图谱</h3>
-            <p>聚焦家庭结构、代际关系、社会化机制、教育分层与文化资本。</p>
-            <ul class="future-list">
-              <li>补足孩子教育图谱里的社会结构视角</li>
-              <li>适合与人类学、教育学内容联动</li>
-              <li>可形成跨学科家庭教育地图</li>
-            </ul>
-            <div class="future-actions">
-              <a class="btn primary" href="./knowledge_graphs/family_socialization/">打开模板页</a>
-            </div>
-          </article>
-
-          <article class="future-card graph-item" data-kind="future" data-category="规划中 技术" data-search="AI 人工智能 机器学习 大模型 agent 知识表示">
-            <div class="future-meta">
-              <span class="status planned">规划中</span>
-              <span class="tag">技术</span>
-              <span class="tag">人工智能</span>
-            </div>
-            <h3>AI 与知识表示图谱</h3>
-            <p>聚焦大模型、Agent、知识表示、推理链条和人机协作。</p>
-            <ul class="future-list">
-              <li>适合作为技术主题主入口</li>
-              <li>可扩展到工具链、提示工程、评测</li>
-              <li>与当前知识图谱工程方法可复用</li>
-            </ul>
-            <div class="future-actions">
-              <a class="btn primary" href="./knowledge_graphs/ai_knowledge_representation/">打开模板页</a>
-            </div>
-          </article>
-
-          <article class="future-card graph-item" data-kind="future" data-category="规划中 人文" data-search="哲学 伦理学 认知哲学 教育哲学 美德 幸福">
-            <div class="future-meta">
-              <span class="status planned">规划中</span>
-              <span class="tag">人文</span>
-              <span class="tag">哲学</span>
-            </div>
-            <h3>哲学与教育观知识图谱</h3>
-            <p>聚焦教育哲学、伦理学、人格成长、自由与纪律、幸福与德性。</p>
-            <ul class="future-list">
-              <li>帮助把“方法”延伸到“价值观”层面</li>
-              <li>可与孩子教育主题深度联动</li>
-              <li>适合做长期知识沉淀</li>
-            </ul>
-            <div class="future-actions">
-              <a class="btn primary" href="./knowledge_graphs/philosophy_education/">打开模板页</a>
-            </div>
-          </article>
-        </div>
+        <div class="future-grid" id="futureDirectory"></div>
       </section>
 
       <section class="section">
@@ -789,17 +553,124 @@ python3 -m http.server 8000</pre>
     <script>
       const searchInput = document.getElementById('searchInput');
       const filterButtons = Array.from(document.querySelectorAll('.filter-chip'));
-      const graphItems = Array.from(document.querySelectorAll('.graph-item'));
       const resultCount = document.getElementById('resultCount');
       const emptyState = document.getElementById('emptyState');
+      const heroStats = document.getElementById('heroStats');
+      const graphGrid = document.getElementById('graphGrid');
+      const metricsGrid = document.getElementById('metricsGrid');
+      const updateGrid = document.getElementById('updateGrid');
+      const futureDirectory = document.getElementById('futureDirectory');
 
       const state = {
         filter: 'all',
-        keyword: ''
+        keyword: '',
+        catalog: null
+      };
+
+      const tagColorMap = {
+        '心理学': 'var(--blue)',
+        '人类学': 'var(--green)',
+        '脑科学': 'var(--orange)',
+        '思想史': '#f59e0b',
+        '学派': 'var(--purple)',
+        '人物与著作': 'var(--pink)'
       };
 
       function normalize(text) {
         return String(text || '').trim().toLowerCase();
+      }
+
+      function createTag(text) {
+        const color = tagColorMap[text] || 'rgba(255,255,255,.6)';
+        return `<span class="tag"><span class="dot" style="background:${color}"></span>${text}</span>`;
+      }
+
+      function renderHeroStats(catalog) {
+        const stats = [
+          ['已上线图谱', String(catalog.live_topics.length)],
+          ['规划中主题', String(catalog.future_topics.length)],
+          ['访问入口', 'Pages / 本地'],
+          ['当前模式', '可交互导航']
+        ];
+        heroStats.innerHTML = stats.map(([label, value]) => `
+          <div class="stat">
+            <div class="stat-label">${label}</div>
+            <div class="stat-value">${value}</div>
+          </div>
+        `).join('');
+      }
+
+      function renderLiveTopics(catalog) {
+        graphGrid.innerHTML = catalog.live_topics.map((topic) => `
+          <article class="graph-card graph-item" data-kind="live" data-category="${topic.categories.join(' ')}" data-search="${topic.search_terms.join(' ')} ${topic.title} ${topic.description}">
+            <div class="preview-frame">
+              <iframe src="${topic.path}" title="${topic.title}预览"></iframe>
+              <div class="preview-mask"></div>
+            </div>
+            <div class="card-content">
+              <div class="tag-row">
+                <span class="status live">${topic.status}</span>
+                ${topic.tags.map(createTag).join('')}
+              </div>
+              <h3>${topic.title}</h3>
+              <p>${topic.description}</p>
+              <ul class="features">
+                ${topic.features.map((feature) => `<li>${feature}</li>`).join('')}
+              </ul>
+              <div class="card-actions">
+                <a class="btn primary" href="${topic.path}">打开图谱</a>
+                <a class="btn" href="${topic.data_path}">查看数据</a>
+              </div>
+            </div>
+          </article>
+        `).join('');
+      }
+
+      function renderMetrics(catalog) {
+        metricsGrid.innerHTML = catalog.metrics.map((metric) => `
+          <div class="metric-card">
+            <h4>${metric.title}</h4>
+            <p>${metric.description}</p>
+            <div class="metric-number">${metric.value}</div>
+          </div>
+        `).join('');
+      }
+
+      function renderUpdates(catalog) {
+        const blocks = [catalog.updates.latest, catalog.updates.next];
+        updateGrid.innerHTML = blocks.map((block) => `
+          <div class="update-card">
+            <h4>${block.title}</h4>
+            <div class="update-meta">${block.date}</div>
+            <ul class="update-list">
+              ${block.items.map((item) => `<li>${item}</li>`).join('')}
+            </ul>
+          </div>
+        `).join('');
+      }
+
+      function renderFutureTopics(catalog) {
+        futureDirectory.innerHTML = catalog.future_topics.map((topic) => `
+          <article class="future-card graph-item" data-kind="future" data-category="${topic.categories.join(' ')}" data-search="${topic.search_terms.join(' ')} ${topic.title} ${topic.description}">
+            <div class="future-meta">
+              <span class="status ${topic.status_style}">${topic.status}</span>
+              ${topic.tags.map((tag) => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            <h3>${topic.title}</h3>
+            <p>${topic.description}</p>
+            <ul class="future-list">
+              ${topic.ideas.map((idea) => `<li>${idea}</li>`).join('')}
+            </ul>
+            <div class="future-actions">
+              <a class="btn primary" href="${topic.path}">打开模板页</a>
+              <a class="btn" href="${topic.path}graph.json">查看模板数据</a>
+            </div>
+          </article>
+        `).join('');
+      }
+
+      function getGraphItems() {
+        return Array.from(document.querySelectorAll('.graph-item'));
       }
 
       function matchesItem(item) {
@@ -813,6 +684,7 @@ python3 -m http.server 8000</pre>
       }
 
       function renderFilters() {
+        const graphItems = getGraphItems();
         let visibleCount = 0;
         graphItems.forEach((item) => {
           const matched = matchesItem(item);
@@ -823,6 +695,22 @@ python3 -m http.server 8000</pre>
         const allVisible = graphItems.filter((item) => !item.classList.contains('hidden')).length;
         emptyState.classList.toggle('hidden', allVisible !== 0);
         resultCount.textContent = `当前共显示 ${allVisible} 个匹配主题，其中 ${visibleCount} 个为已上线图谱`;
+      }
+
+      async function initCatalog() {
+        try {
+          const response = await fetch('./knowledge_graphs/catalog.json');
+          if (!response.ok) throw new Error('catalog.json 加载失败');
+          state.catalog = await response.json();
+          renderHeroStats(state.catalog);
+          renderLiveTopics(state.catalog);
+          renderMetrics(state.catalog);
+          renderUpdates(state.catalog);
+          renderFutureTopics(state.catalog);
+          renderFilters();
+        } catch (error) {
+          resultCount.textContent = '目录数据加载失败，请检查 knowledge_graphs/catalog.json';
+        }
       }
 
       filterButtons.forEach((button) => {
@@ -838,7 +726,7 @@ python3 -m http.server 8000</pre>
         renderFilters();
       });
 
-      renderFilters();
+      initCatalog();
     </script>
   </body>
 </html>

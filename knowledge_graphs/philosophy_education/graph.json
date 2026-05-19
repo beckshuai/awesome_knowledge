@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "title": "哲学与教育观知识图谱",
+    "topic": "教育哲学 / 伦理学 / 人格成长 / 德性",
+    "status": "template",
+    "language": "zh-CN",
+    "created_at": "2026-05-19",
+    "description": "未来图谱模板：用于后续补充教育哲学、伦理学、人格成长、纪律与自由、幸福与德性等内容。"
+  },
+  "nodes": [],
+  "edges": [],
+  "development_tracks": [],
+  "domain_overviews": {},
+  "practical_implications": [],
+  "template_notes": [
+    "后续可补充教育哲学、伦理学、德性、自由、成长、幸福等主题。",
+    "建议作为孩子教育主题的价值观补充层。"
+  ]
+}

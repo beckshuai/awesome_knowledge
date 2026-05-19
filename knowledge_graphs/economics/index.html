@@ -75,10 +75,11 @@
     }
     .card h2 { margin: 0; padding: 18px 20px 0; font-size: 18px; }
     .graph-wrap { min-height: 660px; position: relative; }
-    svg { display: block; width: 100%; height: 660px; }
-    .link { stroke: rgba(148, 163, 184, 0.42); stroke-width: 1.3; }
+    svg { display: block; width: 100%; height: 660px; touch-action: none; user-select: none; }
+    .link { stroke: rgba(148, 163, 184, 0.42); stroke-width: 1.3; cursor: pointer; }
     .link.active { stroke: #f8fafc; stroke-width: 2.4; }
-    .node { cursor: pointer; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35)); }
+    .node { cursor: grab; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35)); }
+    .node:active { cursor: grabbing; }
     .node.dim, .label.dim, .link.dim { opacity: .12; }
     .label { fill: #e5e7eb; font-size: 12px; pointer-events: none; text-shadow: 0 2px 8px #020617; }
     .legend {
@@ -158,23 +159,7 @@
   </main>
 
   <script>
-    const data = {
-      categories: { era: '历史阶段', school: '学派/传统', person: '主要人物', work: '主要著作', concept: '主要概念/观点' },
-      nodes: [
-        ['era_ancient','era','古代与中世纪经济思想','古代-15世纪','经济问题嵌入政治、伦理、宗教与国家治理。'], ['era_mercantilism','era','重商主义与前古典','16-18世纪','国家财富、贸易顺差、金银、关税与重农思想交织。'], ['era_classical','era','古典政治经济学','1776-1870s','分工、价值、分配、贸易与增长成为独立学科核心。'], ['era_marginal','era','边际革命与新古典','1870s-1930s','边际效用、个体选择、均衡与效率分析兴起。'], ['era_keynesian','era','凯恩斯革命与宏观经济学','1930s-1970s','有效需求、失业、总量波动与稳定政策成为核心。'], ['era_postwar','era','二战后综合、制度与发展','1945-1980s','一般均衡、福利、计量、制度、发展与公共选择扩展。'], ['era_modern','era','现代多元经济学','1980s-至今','信息、行为、实验、博弈、制度、增长和不平等交织发展。'],
-        ['school_mercantilism','school','重商主义','16-18世纪','强调贸易顺差、关税、国家干预和财富积累。'], ['school_physiocracy','school','重农学派','18世纪','强调土地、农业剩余、经济循环和自由放任。'], ['school_classical','school','古典经济学','1776-1870s','研究市场秩序、价值、分配、地租、贸易与长期增长。'], ['school_marxism','school','马克思主义政治经济学','19世纪中后期-至今','分析资本、剩余价值、阶级冲突、积累与危机。'], ['school_neoclassical','school','新古典经济学','1870s-至今','理性选择、边际分析、供求均衡与资源配置效率。'], ['school_austrian','school','奥地利学派','1870s-至今','主观价值、知识分散、企业家发现和自发秩序。'], ['school_institutional','school','制度经济学','19世纪末-至今','制度、产权、交易成本和组织结构约束经济行为。'], ['school_keynesian','school','凯恩斯主义','1936-至今','总需求不足、价格工资黏性和宏观稳定政策。'], ['school_chicago','school','芝加哥学派与货币主义','20世纪中后期','价格理论、市场效率、货币供给与有限政府。'], ['school_behavioral','school','行为经济学','1970s-至今','有限理性、启发式、偏差、前景理论与助推。'], ['school_development','school','发展经济学','1940s-至今','贫困、结构转型、人力资本、制度和实验评估。'], ['school_information','school','信息经济学','1970s-至今','信息不对称、逆向选择、道德风险和机制设计。'],
-        ['person_aristotle','person','亚里士多德','384-322 BCE','讨论财产、交换、货币、公平与共同体。'], ['person_aquinas','person','托马斯·阿奎那','1225-1274','讨论公平价格、利息和道德交易。'], ['person_qnay','person','弗朗索瓦·魁奈','1694-1774','以《经济表》展示经济循环和农业剩余。'], ['person_smith','person','亚当·斯密','1723-1790','现代经济学奠基者，论述分工、市场协调和自由贸易。'], ['person_malthus','person','托马斯·马尔萨斯','1766-1834','强调人口增长与资源约束的张力。'], ['person_ricardo','person','大卫·李嘉图','1772-1823','发展劳动价值论、地租理论和比较优势。'], ['person_marx','person','卡尔·马克思','1818-1883','分析资本、剩余价值、积累、剥削和危机。'], ['person_menger','person','卡尔·门格尔','1840-1921','边际革命和奥地利学派奠基人。'], ['person_walras','person','莱昂·瓦尔拉斯','1834-1910','建立一般均衡分析。'], ['person_marshall','person','阿尔弗雷德·马歇尔','1842-1924','系统化供求、弹性、消费者剩余和局部均衡。'], ['person_veblen','person','托斯丹·凡勃伦','1857-1929','旧制度经济学代表，提出炫耀性消费。'], ['person_schumpeter','person','约瑟夫·熊彼特','1883-1950','强调企业家、创新和创造性破坏。'], ['person_keynes','person','约翰·梅纳德·凯恩斯','1883-1946','现代宏观经济学奠基者。'], ['person_hayek','person','弗里德里希·哈耶克','1899-1992','强调知识分散、价格信号和自发秩序。'], ['person_samuelson','person','保罗·萨缪尔森','1915-2009','推动新古典综合和数学化经济学。'], ['person_friedman','person','米尔顿·弗里德曼','1912-2006','货币主义代表，强调货币供给和市场机制。'], ['person_coase','person','罗纳德·科斯','1910-2013','以交易成本和产权解释企业边界与外部性。'], ['person_nash','person','约翰·纳什','1928-2015','提出非合作博弈中的纳什均衡。'], ['person_solow','person','罗伯特·索洛','1924-2023','建立新古典增长模型。'], ['person_sen','person','阿马蒂亚·森','1933-','发展福利经济学、社会选择和能力方法。'], ['person_ostrom','person','埃莉诺·奥斯特罗姆','1933-2012','研究公共池资源和多中心治理。'], ['person_stiglitz','person','约瑟夫·斯蒂格利茨','1943-','信息经济学代表。'], ['person_krugman','person','保罗·克鲁格曼','1953-','新贸易理论与新经济地理代表。'], ['person_kahneman','person','丹尼尔·卡尼曼','1934-2024','把心理学引入经济决策。'], ['person_thaler','person','理查德·塞勒','1945-','行为经济学和助推理论代表。'], ['person_duflo','person','埃丝特·迪弗洛','1972-','以随机对照实验推动发展经济学。'], ['person_acemoglu','person','达龙·阿西莫格鲁','1967-','研究制度、政治经济学和长期繁荣。'],
-        ['work_wealth','work','《国富论》','1776','系统阐述分工、市场机制、自由贸易和政府职能。'], ['work_ricardo','work','《政治经济学及赋税原理》','1817','阐述价值、地租、利润和比较优势。'], ['work_capital','work','《资本论》','1867-1894','分析资本主义生产方式、剩余价值和危机。'], ['work_principles_menger','work','《国民经济学原理》','1871','边际效用和主观价值理论奠基文本。'], ['work_principles_marshall','work','《经济学原理》','1890','综合供求分析、边际理论和局部均衡。'], ['work_general','work','《就业、利息和货币通论》','1936','解释非自愿失业和总需求管理。'], ['work_social_cost','work','《社会成本问题》','1960','外部性、产权界定和交易成本分析。'], ['work_poverty_famines','work','《贫困与饥荒》','1981','以权利方法解释饥荒。'], ['work_governing_commons','work','《公共事务的治理之道》','1990','公共池资源可由多中心制度治理。'], ['work_nudge','work','《助推》','2008','选择架构和温和干预改善决策。'], ['work_why_nations','work','《国家为什么会失败》','2012','以包容性/汲取性制度解释繁荣差异。'], ['work_poor_economics','work','《贫穷的本质》','2011','以微观证据和随机实验理解贫困。'],
-        ['concept_scarcity','concept','稀缺性','','资源有限而欲望多样，经济学研究取舍和配置。'], ['concept_division','concept','分工','','专业化提高生产率，但依赖交换和协调。'], ['concept_invisible','concept','看不见的手','','竞争市场中个体行为可能促进社会福利。'], ['concept_labor_value','concept','劳动价值论','','把劳动视为价值来源或衡量基础。'], ['concept_comparative','concept','比较优势','','相对机会成本差异使贸易互利。'], ['concept_surplus','concept','剩余价值','','解释资本利润来源和劳动剥削关系。'], ['concept_marginal','concept','边际效用','','额外一单位消费带来的效用变化。'], ['concept_equilibrium','concept','一般均衡','','多个市场通过价格联动同时出清。'], ['concept_externality','concept','外部性','','未完全反映在价格中的第三方成本或收益。'], ['concept_transaction','concept','交易成本','','搜寻、谈判、监督和执行成本。'], ['concept_effective_demand','concept','有效需求','','决定产出和就业的总需求水平。'], ['concept_liquidity','concept','流动性偏好','','持有货币的偏好影响利率和投资。'], ['concept_multiplier','concept','乘数效应','','自主支出变化通过收入链条放大影响产出。'], ['concept_monetarism','concept','货币主义','','货币供给影响名义收入、通胀和周期波动。'], ['concept_game','concept','纳什均衡','','无人愿意单方面偏离的策略组合。'], ['concept_growth','concept','经济增长','','长期产出和生活水平提高。'], ['concept_creative','concept','创造性破坏','','创新淘汰旧技术和旧组织。'], ['concept_information','concept','信息不对称','','信息差异导致逆向选择、道德风险和市场失灵。'], ['concept_capability','concept','能力方法','','福利评价关注真实自由和可实现功能。'], ['concept_commons','concept','公共池资源治理','','通过规则、监督和多中心治理管理公共资源。'], ['concept_prospect','concept','前景理论','','参照点、损失厌恶和概率权重影响选择。'], ['concept_nudge','concept','助推','','改变默认选项和选择架构改善决策。'], ['concept_institutions','concept','制度与长期繁荣','','产权、法治和包容性制度影响投资与创新。'], ['concept_rct','concept','随机对照实验','','用实验设计评估政策因果效果。']
-      ].map(([id,type,name,period,summary]) => ({ id,type,name,period,summary })),
-      links: [
-        ['era_ancient','person_aristotle','包含'], ['era_ancient','person_aquinas','包含'], ['era_mercantilism','school_mercantilism','代表'], ['era_mercantilism','school_physiocracy','代表'], ['era_classical','school_classical','代表'], ['era_classical','school_marxism','批判与继承'], ['era_marginal','school_neoclassical','代表'], ['era_marginal','school_austrian','代表'], ['era_keynesian','school_keynesian','代表'], ['era_postwar','school_development','扩展'], ['era_postwar','school_institutional','扩展'], ['era_modern','school_behavioral','代表'], ['era_modern','school_information','代表'], ['school_classical','person_smith','代表人物'], ['person_smith','work_wealth','著有'], ['work_wealth','concept_division','阐释'], ['work_wealth','concept_invisible','阐释'], ['work_wealth','concept_scarcity','基础问题'], ['school_classical','person_ricardo','代表人物'], ['person_ricardo','work_ricardo','著有'], ['work_ricardo','concept_comparative','阐释'], ['work_ricardo','concept_labor_value','发展'], ['school_marxism','person_marx','代表人物'], ['person_marx','work_capital','著有'], ['work_capital','concept_surplus','系统化'], ['work_capital','concept_labor_value','继承批判'], ['school_neoclassical','person_menger','奠基'], ['person_menger','work_principles_menger','著有'], ['work_principles_menger','concept_marginal','阐释'], ['school_neoclassical','person_walras','代表'], ['person_walras','concept_equilibrium','系统化'], ['school_neoclassical','person_marshall','代表'], ['person_marshall','work_principles_marshall','著有'], ['work_principles_marshall','concept_marginal','综合'], ['school_keynesian','person_keynes','奠基'], ['person_keynes','work_general','著有'], ['work_general','concept_effective_demand','系统化'], ['work_general','concept_liquidity','系统化'], ['work_general','concept_multiplier','机制'], ['school_chicago','person_friedman','代表'], ['person_friedman','concept_monetarism','代表观点'], ['school_institutional','person_coase','代表'], ['person_coase','work_social_cost','著有'], ['work_social_cost','concept_transaction','阐释'], ['work_social_cost','concept_externality','重释'], ['school_austrian','person_hayek','代表'], ['person_hayek','concept_invisible','自发秩序'], ['person_samuelson','school_keynesian','新古典综合'], ['person_samuelson','school_neoclassical','新古典综合'], ['person_schumpeter','concept_creative','阐释'], ['concept_creative','concept_growth','推动'], ['person_solow','concept_growth','模型化'], ['person_nash','concept_game','提出'], ['concept_game','school_information','方法基础'], ['school_information','person_stiglitz','代表'], ['person_stiglitz','concept_information','贡献'], ['concept_information','concept_externality','市场失灵'], ['school_development','person_sen','代表'], ['person_sen','work_poverty_famines','著有'], ['work_poverty_famines','concept_capability','相关'], ['person_ostrom','work_governing_commons','著有'], ['work_governing_commons','concept_commons','系统化'], ['school_behavioral','person_kahneman','代表'], ['person_kahneman','concept_prospect','提出'], ['school_behavioral','person_thaler','代表'], ['person_thaler','work_nudge','推动'], ['work_nudge','concept_nudge','普及'], ['school_development','person_duflo','代表'], ['person_duflo','work_poor_economics','合著'], ['work_poor_economics','concept_rct','应用'], ['person_acemoglu','work_why_nations','合著'], ['work_why_nations','concept_institutions','阐释'], ['person_krugman','concept_growth','贸易与地理'], ['school_physiocracy','person_qnay','代表'], ['person_qnay','concept_growth','循环思想'], ['school_institutional','person_veblen','代表']
-      ].map(([source,target,relation]) => ({ source,target,relation })),
-      timeline: [
-        ['古代-15世纪','伦理、家政与公平价格','era_ancient','经济问题嵌入政治、伦理、宗教与国家治理。'], ['16-18世纪','重商主义与国家财富','era_mercantilism','贸易顺差、金银、关税和国家干预成为核心议题。'], ['1776','斯密《国富论》','work_wealth','现代经济学作为独立学科的重要起点。'], ['1817','李嘉图比较优势','work_ricardo','国际贸易理论的经典基础。'], ['1867','马克思《资本论》','work_capital','资本主义生产方式的系统批判。'], ['1870s','边际革命','era_marginal','主观价值与边际分析兴起。'], ['1890','马歇尔《经济学原理》','work_principles_marshall','供求、弹性、局部均衡成为微观核心工具。'], ['1936','凯恩斯革命','work_general','宏观经济学和总需求管理形成。'], ['1940s-1960s','新古典综合与计量化','person_samuelson','数学模型、统计估计和政策分析制度化。'], ['1960s-1970s','科斯、货币主义与公共选择','school_chicago','交易成本、产权、货币供给和政府失灵成为重要议题。'], ['1970s-1990s','信息、博弈与行为','era_modern','理性人模型被信息约束、策略互动和心理偏差扩展。'], ['2000s-至今','实验、制度、危机与不平等','concept_institutions','随机实验、长期制度、金融稳定、创新增长和分配问题成为焦点。']
-      ].map(([year,title,node,summary]) => ({ year,title,node,summary }))
-    };
-
+    let data = null;
     const colors = { era: '#f59e0b', school: '#a78bfa', person: '#34d399', work: '#fb7185', concept: '#60a5fa' };
     const sizes = { era: 15, school: 12, person: 10, work: 9, concept: 8 };
     const svg = document.getElementById('graph');
@@ -182,21 +167,30 @@
     const timelineEl = document.getElementById('timeline');
     const matrix = document.getElementById('matrix');
     const search = document.getElementById('search');
-    let selected = data.nodes.find(n => n.id === 'work_wealth');
+    let selected = null;
     let filter = 'all';
-    let width = 900, height = 660, dragging = null;
-    const nodeById = new Map(data.nodes.map(n => [n.id, n]));
-    data.nodes.forEach((n, i) => {
-      const band = ['era','school','person','work','concept'].indexOf(n.type);
-      n.x = 110 + (band + 0.5) * 145 + Math.random() * 34;
-      n.y = 72 + (i % 18) * 31 + Math.random() * 24;
-      n.vx = 0; n.vy = 0;
-    });
-    data.links.forEach(l => { l.s = nodeById.get(l.source); l.t = nodeById.get(l.target); });
+    let width = 900, height = 660, dragging = null, didDrag = false;
+    let nodeById = new Map();
 
     function resize() { width = svg.clientWidth || 900; height = svg.clientHeight || 660; svg.setAttribute('viewBox', `0 0 ${width} ${height}`); }
     window.addEventListener('resize', resize); resize();
 
+    function initData(raw) {
+      data = raw;
+      data.categories = data.categories || { era: '历史阶段', school: '学派/传统', person: '主要人物', work: '主要著作', concept: '主要概念/观点' };
+      data.links = data.links || data.edges || [];
+      nodeById = new Map(data.nodes.map(n => [n.id, n]));
+      data.nodes.forEach((n, i) => {
+        const band = Math.max(0, ['era','school','person','work','concept'].indexOf(n.type));
+        n.x = 80 + (band + 0.5) * Math.max(120, width / 5) + Math.random() * 28;
+        n.y = 70 + (i % 20) * 29 + Math.random() * 22;
+        n.vx = 0; n.vy = 0;
+      });
+      data.links = data.links
+        .filter(l => nodeById.has(l.source) && nodeById.has(l.target))
+        .map(l => ({ ...l, s: nodeById.get(l.source), t: nodeById.get(l.target) }));
+      selected = nodeById.get('work_wealth') || data.nodes[0] || null;
+    }
     function matches(n) {
       const q = search.value.trim().toLowerCase();
       const text = `${n.name} ${n.period || ''} ${n.summary}`.toLowerCase();
@@ -229,7 +223,8 @@
     }
     function renderDetail() {
       const rel = relationList(selected.id);
-      detail.innerHTML = `<span class="badge"><i class="dot" style="background:${colors[selected.type]}"></i>${data.categories[selected.type]}${selected.period ? ' · ' + selected.period : ''}</span><h3>${selected.name}</h3><p>${selected.summary}</p><div class="relations">${rel.length ? rel.map(r => `<div class="relation"><strong>${r.relation}</strong> → ${r.other.name} <span style="color:#94a3b8">(${data.categories[r.other.type]})</span></div>`).join('') : '<div class="relation">暂无关联</div>'}</div>`;
+      detail.innerHTML = `<span class="badge"><i class="dot" style="background:${colors[selected.type] || '#94a3b8'}"></i>${data.categories[selected.type] || selected.type}${selected.period ? ' · ' + selected.period : ''}</span><h3>${selected.name}</h3><p>${selected.summary || '暂无摘要'}</p><div class="relations">${rel.length ? rel.map(r => `<div class="relation" data-node="${r.other.id}"><strong>${r.relation}</strong> → ${r.other.name} <span style="color:#94a3b8">(${data.categories[r.other.type] || r.other.type})</span></div>`).join('') : '<div class="relation">暂无关联</div>'}</div>`;
+      detail.querySelectorAll('[data-node]').forEach(el => el.addEventListener('click', () => select(nodeById.get(el.dataset.node))));
     }
     function renderGraph() {
       const visible = new Set(data.nodes.filter(matches).map(n => n.id));
@@ -243,6 +238,7 @@
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', l.s.x); line.setAttribute('y1', l.s.y); line.setAttribute('x2', l.t.x); line.setAttribute('y2', l.t.y);
         line.setAttribute('class', `link ${nbs.has(l.source) && nbs.has(l.target) ? 'active' : selected ? 'dim' : ''}`);
+        line.addEventListener('click', () => select(l.s));
         gLinks.appendChild(line);
       });
       data.nodes.forEach(n => {
@@ -259,8 +255,8 @@
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         label.setAttribute('x', sizes[n.type] + 7); label.setAttribute('y', 4); label.setAttribute('class', `label ${active ? '' : 'dim'}`); label.textContent = n.name;
         group.append(circle, label);
-        group.addEventListener('click', () => select(n));
-        group.addEventListener('pointerdown', e => { dragging = n; svg.setPointerCapture(e.pointerId); });
+        group.addEventListener('click', () => { if (!didDrag) select(n); });
+        group.addEventListener('pointerdown', e => { dragging = n; didDrag = false; n.fx = n.x; n.fy = n.y; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
         gNodes.appendChild(group);
       });
     }
@@ -279,14 +275,15 @@
       data.nodes.forEach(n => {
         const targetX = ({era:.12, school:.28, person:.46, work:.64, concept:.82}[n.type]) * width;
         n.vx += (targetX - n.x) * .003; n.vy += (height/2 - n.y) * .001;
-        if (n !== dragging) { n.x += n.vx; n.y += n.vy; }
+        if (n !== dragging) { n.x += n.vx; n.y += n.vy; } else { n.x = n.fx; n.y = n.fy; }
         n.vx *= .82; n.vy *= .82; n.x = Math.max(24, Math.min(width-150, n.x)); n.y = Math.max(34, Math.min(height-28, n.y));
       });
       renderGraph(); requestAnimationFrame(tick);
     }
     function select(n) { if (!n) return; selected = n; renderDetail(); renderGraph(); }
-    svg.addEventListener('pointermove', e => { if (!dragging) return; const r = svg.getBoundingClientRect(); dragging.x = (e.clientX - r.left) * width / r.width; dragging.y = (e.clientY - r.top) * height / r.height; dragging.vx = dragging.vy = 0; });
-    svg.addEventListener('pointerup', () => dragging = null);
+    svg.addEventListener('pointermove', e => { if (!dragging) return; const r = svg.getBoundingClientRect(); dragging.fx = (e.clientX - r.left) * width / r.width; dragging.fy = (e.clientY - r.top) * height / r.height; dragging.vx = dragging.vy = 0; didDrag = true; });
+    svg.addEventListener('pointerup', e => { if (dragging) { dragging.x = dragging.fx; dragging.y = dragging.fy; dragging.fx = dragging.fy = null; try { svg.releasePointerCapture(e.pointerId); } catch (_) {} } setTimeout(() => { didDrag = false; }, 0); dragging = null; });
+    svg.addEventListener('pointercancel', () => { dragging = null; didDrag = false; });
     search.addEventListener('input', renderGraph);
     document.getElementById('toolbar').addEventListener('click', e => {
       if (e.target.tagName !== 'BUTTON') return;
@@ -294,7 +291,17 @@
       document.querySelectorAll('#toolbar button').forEach(b => b.classList.toggle('active', b === e.target));
       renderGraph();
     });
-    renderStatic(); renderDetail(); tick();
+    async function boot() {
+      try {
+        const response = await fetch('./graph.json');
+        if (!response.ok) throw new Error('graph.json 加载失败');
+        initData(await response.json());
+        renderStatic(); renderDetail(); tick();
+      } catch (error) {
+        document.body.innerHTML = `<div style="padding:32px;color:#fff;font-family:sans-serif;line-height:1.8;">页面加载失败：${error.message}<br>请通过本地静态服务器或 GitHub Pages 打开页面。</div>`;
+      }
+    }
+    boot();
   </script>
 </body>
 </html>

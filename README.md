@@ -18,39 +18,66 @@
 包含：
 
 - 交互式知识图谱
-- 发展轨迹视图
-- 关联关系浏览
-- 结构化数据文件 `graph.json`
-- 来源文件 `sources.json`
+- 心理学 / 人类学 / 脑科学发展轨迹
+- 节点间关联关系浏览
+- 结构化数据文件 `knowledge_graphs/child_education/graph.json`
+- 来源文件 `knowledge_graphs/child_education/sources.json`
+
 
 ### 2. 经济学知识图谱
 
 - 在线访问：<https://beckshuai.github.io/awesome_knowledge/knowledge_graphs/economics/>
 - 本地目录：`knowledge_graphs/economics/`
+- 内容方向：思想史、学派、人物与著作
 
 包含：
 
-- 学派 / 人物 / 概念关系图
+- 学派 / 人物 / 概念关系网络
 - 思想史时间线
-- 关系说明与交互浏览
-- 结构化数据文件 `graph.json`
-- 来源文件 `sources.json`
+- 关联矩阵与细节说明
+- 结构化数据文件 `knowledge_graphs/economics/graph.json`
+- 来源文件 `knowledge_graphs/economics/sources.json`
+
+
+## 未来图谱目录
+
+以下主题已经进入总站目录管理，首页与 README 通过同一份 `knowledge_graphs/catalog.json` 统一维护：
+
+- **学习科学知识图谱**（规划中）：`knowledge_graphs/learning_science/`
+- **家庭与社会化知识图谱**（调研中）：`knowledge_graphs/family_socialization/`
+- **AI 与知识表示图谱**（规划中）：`knowledge_graphs/ai_knowledge_representation/`
+- **哲学与教育观知识图谱**（规划中）：`knowledge_graphs/philosophy_education/`
 
 ## 项目结构
 
 ```text
 awesome_knowledge/
 ├── index.html                       # 总导航首页 / GitHub Pages 入口
-├── README.md                        # 项目说明
+├── README.md                        # 项目说明（由 catalog 同步维护）
+├── scripts/
+│   └── sync_catalog.py              # 用统一目录数据生成 README
 └── knowledge_graphs/
+    ├── catalog.json                # 统一目录索引（已上线 + 未来主题）
     ├── child_education/
     │   ├── index.html               # 孩子教育交互图谱
     │   ├── graph.json               # 图谱结构化数据
     │   └── sources.json             # 资料来源
-    └── economics/
-        ├── index.html               # 经济学交互图谱
-        ├── graph.json               # 图谱结构化数据
-        └── sources.json             # 资料来源
+    ├── economics/
+    │   ├── index.html               # 经济学交互图谱
+    │   ├── graph.json               # 图谱结构化数据
+    │   └── sources.json             # 资料来源
+    ├── learning_science/
+    │   ├── index.html               # 模板页
+    │   └── graph.json               # 空模板数据
+    ├── family_socialization/
+    │   ├── index.html               # 模板页
+    │   └── graph.json               # 空模板数据
+    ├── ai_knowledge_representation/
+    │   ├── index.html               # 模板页
+    │   └── graph.json               # 空模板数据
+    └── philosophy_education/
+        ├── index.html               # 模板页
+        └── graph.json               # 空模板数据
 ```
 
 ## 本地运行
@@ -82,13 +109,17 @@ http://localhost:8000
 - 分类筛选
 - 未来图谱目录
 - GitHub Pages 与本地运行说明
+- 主题统计与更新日志
 
-## 后续可扩展方向
+## 自动同步说明
 
-- 学习科学知识图谱
-- 家庭与社会化知识图谱
-- AI 与知识表示图谱
-- 哲学与教育观知识图谱
+- 首页中的未来目录与统计信息来自 `knowledge_graphs/catalog.json`
+- README 通过 `scripts/sync_catalog.py` 基于同一份目录数据生成
+- 若未来目录有变更，可运行：
+
+```bash
+python3 scripts/sync_catalog.py
+```
 
 ## 说明
 

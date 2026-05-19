@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "title": "学习科学知识图谱",
+    "topic": "学习科学 / 教学设计 / 学习机制",
+    "status": "template",
+    "language": "zh-CN",
+    "created_at": "2026-05-19",
+    "description": "未来图谱模板：用于后续补充学习科学主题下的观点、人物、著作、关系与发展轨迹。"
+  },
+  "nodes": [],
+  "edges": [],
+  "development_tracks": [],
+  "domain_overviews": {},
+  "practical_implications": [],
+  "template_notes": [
+    "后续可补充认知负荷、元认知、练习设计、反馈机制、记忆与迁移等主题。",
+    "建议与孩子教育知识图谱建立跨主题节点连接。"
+  ]
+}
