@@ -156,7 +156,7 @@
       <div class="stats" id="stats"></div>
       <svg id="graph" role="img" aria-label="经济学知识图谱"></svg>
       <div class="legend" id="legend"></div>
-      <div class="hint">操作提示：拖动节点可调整布局；点击节点可高亮一阶关系；点击时间线可定位相应节点；搜索会同时匹配名称、时期与摘要。</div>
+      <div class="hint">操作提示：默认展示经济学发展历史中的主要阶段、学派与人物；滚轮可缩放，拖动画布可平移，拖动节点可调整布局并自动保存到本地。</div>
     </section>
 
     <aside class="side">
@@ -183,6 +183,8 @@
     let data = null;
     const colors = { era: '#f59e0b', school: '#a78bfa', person: '#34d399', work: '#fb7185', concept: '#60a5fa' };
     const sizes = { era: 15, school: 12, person: 10, work: 9, concept: 8 };
+    const DEFAULT_HISTORY_TYPES = new Set(['era', 'school', 'person']);
+    const LAYOUT_STORAGE_KEY = 'economics-graph-layout-v2';
     const svg = document.getElementById('graph');
     const detail = document.getElementById('detail');
     const timelineEl = document.getElementById('timeline');
@@ -192,65 +194,413 @@
     let selected = null;
     let selectedPracticeId = null;
     let filter = 'all';
-    let width = 900, height = 660, dragging = null, didDrag = false;
+    let hasSelectionFocus = false;
+    let width = 900, height = 660;
+    let dragging = null, didDrag = false;
+    let panning = null, didPan = false, preventBackgroundClick = false;
+    let viewport = { scale: 1, tx: 0, ty: 0 };
+    let layoutSaveTimer = null;
     let nodeById = new Map();
+    let adjacency = new Map();
 
-    function resize() { width = svg.clientWidth || 900; height = svg.clientHeight || 660; svg.setAttribute('viewBox', `0 0 ${width} ${height}`); }
-    window.addEventListener('resize', resize); resize();
+    function resize() {
+      width = svg.clientWidth || 900;
+      height = svg.clientHeight || 660;
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      renderGraph();
+    }
+    window.addEventListener('resize', resize);
+
+    function createSvg(tag, attrs = {}, text = '') {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      if (text) el.textContent = text;
+      return el;
+    }
+
+    function getSeededJitter(seedText) {
+      let seed = 0;
+      for (let i = 0; i < seedText.length; i += 1) seed = (seed * 31 + seedText.charCodeAt(i)) % 2147483647;
+      return { x: Math.sin(seed * 0.17) * 0.9, y: Math.cos(seed * 0.11) * 0.9 };
+    }
+
+    function getSvgPoint(event) {
+      const rect = svg.getBoundingClientRect();
+      return {
+        x: Math.max(24, Math.min(width - 24, ((event.clientX - rect.left) / rect.width) * width)),
+        y: Math.max(24, Math.min(height - 24, ((event.clientY - rect.top) / rect.height) * height))
+      };
+    }
+
+    function toGraphPoint(point) {
+      return {
+        x: (point.x - viewport.tx) / viewport.scale,
+        y: (point.y - viewport.ty) / viewport.scale
+      };
+    }
+
+    function clampNode(node) {
+      node.x = Math.max(24, Math.min(width - 150, node.x));
+      node.y = Math.max(34, Math.min(height - 28, node.y));
+    }
+
+    function schedulePersistLayout() {
+      clearTimeout(layoutSaveTimer);
+      layoutSaveTimer = setTimeout(() => persistLayoutState(), 320);
+    }
+
+    function persistLayoutState() {
+      if (!data) return;
+      try {
+        const positions = Object.fromEntries(data.nodes.map(node => [node.id, {
+          x: Number(node.x.toFixed(2)),
+          y: Number(node.y.toFixed(2))
+        }]));
+        const payload = {
+          positions,
+          viewport: {
+            scale: Number(viewport.scale.toFixed(3)),
+            tx: Number(viewport.tx.toFixed(2)),
+            ty: Number(viewport.ty.toFixed(2))
+          }
+        };
+        localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(payload));
+      } catch (_) {}
+    }
+
+    function restorePersistedLayout() {
+      try {
+        const raw = localStorage.getItem(LAYOUT_STORAGE_KEY);
+        if (!raw) return false;
+        const payload = JSON.parse(raw);
+        if (payload.positions && typeof payload.positions === 'object') {
+          Object.entries(payload.positions).forEach(([nodeId, point]) => {
+            const node = nodeById.get(nodeId);
+            if (!node) return;
+            node.x = Number(point.x);
+            node.y = Number(point.y);
+            clampNode(node);
+          });
+        }
+        if (payload.viewport) {
+          viewport.scale = Math.max(0.65, Math.min(2.5, Number(payload.viewport.scale) || 1));
+          viewport.tx = Number(payload.viewport.tx) || 0;
+          viewport.ty = Number(payload.viewport.ty) || 0;
+        }
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function getViewportTransform() {
+      return `matrix(${viewport.scale} 0 0 ${viewport.scale} ${viewport.tx} ${viewport.ty})`;
+    }
+
+    function shouldUseHistoryLayout() {
+      return filter === 'all' && !getSearchQuery();
+    }
+
+    function getHistoryColumns() {
+      return {
+        era: width * 0.17,
+        school: width * 0.42,
+        person: width * 0.73,
+        work: width * 0.84,
+        concept: width * 0.91
+      };
+    }
+
+    function findNearestEraId(nodeId, eraIds, visibleIds) {
+      if (eraIds.includes(nodeId)) return nodeId;
+      const visited = new Set([nodeId]);
+      const queue = [nodeId];
+      while (queue.length) {
+        const current = queue.shift();
+        const neighbors = adjacency.get(current) || [];
+        for (const nextId of neighbors) {
+          if (visited.has(nextId) || !visibleIds.has(nextId)) continue;
+          if (eraIds.includes(nextId)) return nextId;
+          visited.add(nextId);
+          queue.push(nextId);
+        }
+      }
+      return null;
+    }
+
+    function buildHistoryTargets(visibleIds) {
+      if (!data || !shouldUseHistoryLayout()) return null;
+      const eraIds = data.timeline
+        .map(event => event.node)
+        .filter((id, index, arr) => arr.indexOf(id) === index && visibleIds.has(id) && nodeById.get(id)?.type === 'era');
+      if (!eraIds.length) return null;
+
+      const columns = getHistoryColumns();
+      const top = 72;
+      const gap = 18;
+      const availableHeight = height - 120 - gap * Math.max(0, eraIds.length - 1);
+      const bandHeight = Math.max(64, availableHeight / Math.max(eraIds.length, 1));
+      const sectionByNode = new Map();
+      const targets = new Map();
+
+      visibleIds.forEach(nodeId => {
+        const node = nodeById.get(nodeId);
+        if (!node) return;
+        const eraId = findNearestEraId(nodeId, eraIds, visibleIds) || (node.type === 'era' ? node.id : eraIds[0]);
+        if (eraId) sectionByNode.set(nodeId, eraId);
+      });
+
+      eraIds.forEach((eraId, eraIndex) => {
+        const bandTop = top + eraIndex * (bandHeight + gap);
+        const bandBottom = bandTop + bandHeight;
+        const centerY = (bandTop + bandBottom) / 2;
+
+        ['era', 'school', 'person', 'work', 'concept'].forEach(type => {
+          const bucket = [...visibleIds]
+            .map(nodeId => nodeById.get(nodeId))
+            .filter(node => node && node.type === type && sectionByNode.get(node.id) === eraId)
+            .sort((a, b) => String(a.period || '').localeCompare(String(b.period || ''), 'zh-CN') || a.name.localeCompare(b.name, 'zh-CN'));
+          if (!bucket.length) return;
+
+          const spacing = type === 'era'
+            ? 1
+            : Math.min(type === 'person' ? 28 : 20, Math.max(12, (bandHeight - 18) / Math.max(bucket.length, 1)));
+          const startY = bucket.length === 1 ? centerY : centerY - ((bucket.length - 1) * spacing) / 2;
+
+          bucket.forEach((node, index) => {
+            const jitter = getSeededJitter(`${eraId}-${type}-${node.id}`);
+            const offsetX = type === 'era' ? 0 : jitter.x * (type === 'person' ? 18 : 12);
+            const offsetY = bucket.length === 1 ? jitter.y * 8 : jitter.y * 4;
+            targets.set(node.id, {
+              x: columns[type] + offsetX,
+              y: Math.max(42, Math.min(height - 32, startY + index * spacing + offsetY))
+            });
+          });
+        });
+      });
+
+      return targets;
+    }
 
     function initData(raw) {
       data = raw;
       data.categories = data.categories || { era: '历史阶段', school: '学派/传统', person: '主要人物', work: '主要著作', concept: '主要概念/观点' };
       data.links = data.links || data.edges || [];
-      nodeById = new Map(data.nodes.map(n => [n.id, n]));
-      data.nodes.forEach((n, i) => {
-        const band = Math.max(0, ['era','school','person','work','concept'].indexOf(n.type));
-        n.x = 80 + (band + 0.5) * Math.max(120, width / 5) + Math.random() * 28;
-        n.y = 70 + (i % 20) * 29 + Math.random() * 22;
-        n.vx = 0; n.vy = 0;
+      nodeById = new Map(data.nodes.map(node => [node.id, node]));
+      const typeOrder = ['era', 'school', 'person', 'work', 'concept'];
+      const indexByType = new Map(typeOrder.map(type => [type, 0]));
+      data.nodes.forEach((node, index) => {
+        const band = Math.max(0, typeOrder.indexOf(node.type));
+        const typeIndex = indexByType.get(node.type) || 0;
+        const jitter = getSeededJitter(`${node.id}-${index}`);
+        node.x = 90 + (band + 0.5) * Math.max(128, width / 5) + jitter.x * 24;
+        node.y = 78 + typeIndex * 28 + jitter.y * 20;
+        node.vx = 0;
+        node.vy = 0;
+        indexByType.set(node.type, typeIndex + 1);
+        clampNode(node);
       });
       data.links = data.links
-        .filter(l => nodeById.has(l.source) && nodeById.has(l.target))
-        .map(l => ({ ...l, s: nodeById.get(l.source), t: nodeById.get(l.target) }));
-      selected = nodeById.get('work_wealth') || data.nodes[0] || null;
+        .filter(link => nodeById.has(link.source) && nodeById.has(link.target))
+        .map(link => ({ ...link, s: nodeById.get(link.source), t: nodeById.get(link.target) }));
+      adjacency = new Map(data.nodes.map(node => [node.id, []]));
+      data.links.forEach(link => {
+        adjacency.get(link.source)?.push(link.target);
+        adjacency.get(link.target)?.push(link.source);
+      });
+      const restored = restorePersistedLayout();
+      if (!restored) {
+        const defaultVisible = new Set(data.nodes.filter(node => DEFAULT_HISTORY_TYPES.has(node.type)).map(node => node.id));
+        const historyTargets = buildHistoryTargets(defaultVisible);
+        historyTargets?.forEach((point, nodeId) => {
+          const node = nodeById.get(nodeId);
+          if (!node) return;
+          node.x = point.x;
+          node.y = point.y;
+          clampNode(node);
+        });
+      }
+      selected = null;
     }
-    function matches(n) {
-      const q = search.value.trim().toLowerCase();
-      const text = `${n.name} ${n.period || ''} ${n.summary}`.toLowerCase();
-      return (filter === 'all' || n.type === filter) && (!q || text.includes(q));
+
+    function getSearchQuery() { return search.value.trim().toLowerCase(); }
+    function matchesTypeFilter(node) { return filter === 'all' || node.type === filter; }
+    function matchesSearch(node) {
+      const text = `${node.name} ${node.period || ''} ${node.summary || ''}`.toLowerCase();
+      return !getSearchQuery() || text.includes(getSearchQuery());
     }
+
+    function getVisibleGraphNodeIds() {
+      const q = getSearchQuery();
+      if (!q) {
+        const baseVisible = new Set(data.nodes
+          .filter(node => filter === 'all' ? DEFAULT_HISTORY_TYPES.has(node.type) : matchesTypeFilter(node))
+          .map(node => node.id));
+        if (filter === 'all' && hasSelectionFocus && selected && !baseVisible.has(selected.id)) {
+          baseVisible.add(selected.id);
+          data.links.forEach(link => {
+            if (link.source === selected.id) baseVisible.add(link.target);
+            if (link.target === selected.id) baseVisible.add(link.source);
+          });
+        }
+        return baseVisible;
+      }
+      const visible = new Set(data.nodes.filter(node => matchesTypeFilter(node) && matchesSearch(node)).map(node => node.id));
+      data.links.forEach(link => {
+        if (visible.has(link.source)) visible.add(link.target);
+        if (visible.has(link.target)) visible.add(link.source);
+      });
+      return visible;
+    }
+
+    function ensureSelectedVisible() {
+      const visible = getVisibleGraphNodeIds();
+      if (!selected) return;
+      if (visible.has(selected.id)) return;
+      selected = null;
+      hasSelectionFocus = false;
+    }
+
     function neighborIds(id) {
       const ids = new Set([id]);
-      data.links.forEach(l => { if (l.source === id) ids.add(l.target); if (l.target === id) ids.add(l.source); });
+      data.links.forEach(link => {
+        if (link.source === id) ids.add(link.target);
+        if (link.target === id) ids.add(link.source);
+      });
       return ids;
     }
+
     function relationList(id) {
-      return data.links.filter(l => l.source === id || l.target === id).map(l => {
-        const other = nodeById.get(l.source === id ? l.target : l.source);
-        return { relation: l.relation, other };
-      });
+      return data.links
+        .filter(link => link.source === id || link.target === id)
+        .map(link => ({ relation: link.relation, other: nodeById.get(link.source === id ? link.target : link.source) }))
+        .filter(item => item.other);
     }
+
+    function estimateLabelWidth(node) {
+      const chars = Array.from(node.name || '').length;
+      return Math.max(46, chars * 11 + 12);
+    }
+
+    function buildLabelCandidates(node) {
+      const radius = sizes[node.type] + (node.id === selected?.id ? 5 : 0);
+      const gap = radius + 8;
+      const estimatedWidth = estimateLabelWidth(node);
+      const preferRight = node.x < width * 0.58;
+      const right = [
+        { x: node.x + gap, y: node.y - 10, anchor: 'start', weight: preferRight ? 0 : 4 },
+        { x: node.x + gap, y: node.y + 4, anchor: 'start', weight: preferRight ? 1 : 5 },
+        { x: node.x + gap, y: node.y + 18, anchor: 'start', weight: preferRight ? 2 : 6 }
+      ];
+      const left = [
+        { x: node.x - gap, y: node.y - 10, anchor: 'end', weight: preferRight ? 6 : 0 },
+        { x: node.x - gap, y: node.y + 4, anchor: 'end', weight: preferRight ? 5 : 1 },
+        { x: node.x - gap, y: node.y + 18, anchor: 'end', weight: preferRight ? 7 : 2 }
+      ];
+      const vertical = [
+        { x: node.x, y: node.y - gap - 2, anchor: 'middle', weight: 8 },
+        { x: node.x, y: node.y + gap + 14, anchor: 'middle', weight: 9 }
+      ];
+      return [...right, ...left, ...vertical].map(candidate => {
+        let leftEdge = candidate.x;
+        if (candidate.anchor === 'end') leftEdge = candidate.x - estimatedWidth;
+        if (candidate.anchor === 'middle') leftEdge = candidate.x - estimatedWidth / 2;
+        return {
+          ...candidate,
+          width: estimatedWidth,
+          box: {
+            left: leftEdge,
+            right: leftEdge + estimatedWidth,
+            top: candidate.y - 12,
+            bottom: candidate.y + 5
+          }
+        };
+      }).sort((a, b) => a.weight - b.weight);
+    }
+
+    function boxesIntersect(a, b) {
+      return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+    }
+
+    function circleIntersectsBox(node, box) {
+      const radius = sizes[node.type] + 4;
+      const closestX = Math.max(box.left, Math.min(node.x, box.right));
+      const closestY = Math.max(box.top, Math.min(node.y, box.bottom));
+      const dx = node.x - closestX;
+      const dy = node.y - closestY;
+      return dx * dx + dy * dy < radius * radius;
+    }
+
+    function computeLabelPlacements(nodes) {
+      const placements = new Map();
+      const placedBoxes = [];
+      const prioritized = [...nodes].sort((a, b) => {
+        const selectedDelta = Number(b.id === selected?.id) - Number(a.id === selected?.id);
+        if (selectedDelta) return selectedDelta;
+        const sizeDelta = sizes[b.type] - sizes[a.type];
+        if (sizeDelta) return sizeDelta;
+        return a.y - b.y;
+      });
+
+      prioritized.forEach(node => {
+        const candidates = buildLabelCandidates(node);
+        let best = candidates[0];
+        let bestScore = Number.POSITIVE_INFINITY;
+
+        candidates.forEach(candidate => {
+          let score = candidate.weight;
+          if (candidate.box.left < 8 || candidate.box.right > width - 8) score += 200;
+          if (candidate.box.top < 18 || candidate.box.bottom > height - 8) score += 200;
+          placedBoxes.forEach(box => {
+            if (boxesIntersect(candidate.box, box.box)) score += 1200;
+          });
+          nodes.forEach(otherNode => {
+            if (otherNode.id === node.id) return;
+            if (circleIntersectsBox(otherNode, candidate.box)) score += 120;
+          });
+          if (score < bestScore) {
+            best = candidate;
+            bestScore = score;
+          }
+        });
+
+        placements.set(node.id, best);
+        placedBoxes.push({ nodeId: node.id, box: best.box });
+      });
+
+      return placements;
+    }
+
     function getFilteredPractices() {
-      const q = search.value.trim().toLowerCase();
+      const q = getSearchQuery();
       return (data.practical_guides || []).filter(guide => {
         const text = [guide.title, guide.scenario, guide.habit, guide.daily_use, ...(guide.steps || [])].filter(Boolean).join(' ').toLowerCase();
         return !q || text.includes(q);
       });
     }
+
     function renderStatic() {
-      document.getElementById('legend').innerHTML = Object.entries(data.categories).map(([k,v]) => `<span><i class="dot" style="background:${colors[k]}"></i>${v}</span>`).join('');
-      const counts = Object.keys(data.categories).map(k => `${data.categories[k]} ${data.nodes.filter(n => n.type === k).length}`);
-      document.getElementById('stats').innerHTML = [`节点 ${data.nodes.length}`, `关系 ${data.links.length}`, ...counts].map(x => `<span class="stat">${x}</span>`).join('');
-      timelineEl.innerHTML = data.timeline.map(e => `<div class="event" data-node="${e.node}"><div class="year">${e.year}</div><div><div class="event-title">${e.title}</div><div class="event-summary">${e.summary}</div></div></div>`).join('');
-      timelineEl.querySelectorAll('.event').forEach(el => el.addEventListener('click', () => select(nodeById.get(el.dataset.node))));
+      document.getElementById('legend').innerHTML = Object.entries(data.categories)
+        .map(([key, value]) => `<span><i class="dot" style="background:${colors[key]}"></i>${value}</span>`)
+        .join('');
+      const counts = Object.keys(data.categories).map(key => `${data.categories[key]} ${data.nodes.filter(node => node.type === key).length}`);
+      document.getElementById('stats').innerHTML = [`节点 ${data.nodes.length}`, `关系 ${data.links.length}`, ...counts].map(item => `<span class="stat">${item}</span>`).join('');
+      timelineEl.innerHTML = data.timeline.map(event => `<div class="event" data-node="${event.node}"><div class="year">${event.year}</div><div><div class="event-title">${event.title}</div><div class="event-summary">${event.summary}</div></div></div>`).join('');
+      timelineEl.querySelectorAll('.event').forEach(el => el.addEventListener('click', () => {
+        search.value = '';
+        filter = 'all';
+        document.querySelectorAll('#toolbar button').forEach(button => button.classList.toggle('active', button.dataset.filter === 'all'));
+        select(nodeById.get(el.dataset.node), { focusGraph: true });
+      }));
       matrix.innerHTML = [
         ['古典 → 新古典','从劳动价值、分配与增长问题，转向边际效用、供求均衡和效率分析。'],
         ['凯恩斯 → 现代宏观','从有效需求和失业出发，发展财政政策、货币政策、预期与价格黏性研究。'],
         ['制度 → 发展','产权、法治、国家能力和包容性制度被用于解释长期繁荣差异。'],
         ['信息 → 行为','信息不对称和有限理性共同扩展了完全理性与完全信息假设。'],
         ['博弈 → 机制设计','策略互动、激励相容和制度设计连接市场、组织与公共政策。']
-      ].map(([a,b]) => `<div class="pill"><strong>${a}</strong><br>${b}</div>`).join('');
+      ].map(([title, content]) => `<div class="pill"><strong>${title}</strong><br>${content}</div>`).join('');
     }
+
     function renderPracticeList() {
       const guides = getFilteredPractices().slice().sort((a, b) => {
         const aRelated = (a.related_nodes || []).includes(selected?.id) ? 1 : 0;
@@ -258,9 +608,7 @@
         if (aRelated !== bRelated) return bRelated - aRelated;
         return a.title.localeCompare(b.title, 'zh-CN');
       });
-      if (!selectedPracticeId || !guides.some(g => g.id === selectedPracticeId)) {
-        selectedPracticeId = guides[0]?.id || null;
-      }
+      if (!selectedPracticeId || !guides.some(guide => guide.id === selectedPracticeId)) selectedPracticeId = guides[0]?.id || null;
       if (!guides.length) {
         practiceList.innerHTML = '<div class="pill">当前搜索条件下没有可显示的实践建议。</div>';
         return;
@@ -280,90 +628,257 @@
         renderDetail();
       }));
     }
+
     function renderDetail() {
+      if (!selected) {
+        detail.innerHTML = '<h3>发展历史导览</h3><p>默认画布展示经济学发展历史中的主要阶段、学派与人物。点击任一节点后，这里会显示该节点的摘要、直接关联、相关实践参考与可继续浏览的知识线索。</p><div class="detail-section"><div class="detail-section-head"><h4>当前视图说明</h4></div><div class="relations"><div class="relation">默认“全部”视图突出历史脉络：历史阶段 → 学派 → 主要人物。</div><div class="relation">搜索时仅显示命中节点及其直接关联节点，便于快速聚焦。</div><div class="relation">支持滚轮缩放、拖动画布平移、拖动节点调整布局，并自动保存到 localStorage。</div></div></div>';
+        return;
+      }
       const rel = relationList(selected.id);
       const relatedGuides = (data.practical_guides || []).filter(guide => (guide.related_nodes || []).includes(selected.id));
       const activeGuide = (data.practical_guides || []).find(guide => guide.id === selectedPracticeId);
       const displayGuide = relatedGuides.find(guide => guide.id === selectedPracticeId) || relatedGuides[0] || activeGuide;
-      detail.innerHTML = `<span class="badge"><i class="dot" style="background:${colors[selected.type] || '#94a3b8'}"></i>${data.categories[selected.type] || selected.type}${selected.period ? ' · ' + selected.period : ''}</span><h3>${selected.name}</h3><p>${selected.summary || '暂无摘要'}</p>${relatedGuides.length ? `<div class="detail-section"><div class="detail-section-head"><h4>现实生活实践参考</h4><span class="badge">关联 ${relatedGuides.length} 条</span></div><div class="section-tip">这些建议与当前节点直接相关。点击卡片即可在右侧展开对应的小习惯、操作步骤和日常用法。</div><div class="practice-inline-list">${relatedGuides.map(guide => `<div class="practice-inline-card ${displayGuide?.id === guide.id ? 'active' : ''}" data-practice="${guide.id}"><div class="practice-kicker">实践参考</div><strong style="display:block;margin-top:6px;">${guide.title}</strong><div class="event-summary" style="margin-top:8px;">${guide.habit}</div><div class="practice-meta">适用场景：${guide.scenario}</div></div>`).join('')}</div></div>` : ''}<div class="detail-section"><div class="detail-section-head"><h4>直接关联</h4><span class="section-tip">点击条目可继续沿关系浏览</span></div><div class="relations">${rel.length ? rel.map(r => `<div class="relation" data-node="${r.other.id}"><strong>${r.relation}</strong> → ${r.other.name} <span style="color:#94a3b8">(${data.categories[r.other.type] || r.other.type})</span></div>`).join('') : '<div class="relation">暂无关联</div>'}</div></div>${displayGuide ? `<div class="detail-section"><div class="detail-section-head"><h4>${relatedGuides.length ? '当前展开的实践指南' : '当前选中的实践参考'}</h4><span class="section-tip">${displayGuide.scenario}</span></div><div class="practice-guide-card"><strong>${displayGuide.title}</strong><div style="margin-top:6px;color:#94a3b8;">适用场景：${displayGuide.scenario}</div><div style="margin-top:10px;">小习惯：${displayGuide.habit}</div><ol class="practice-guide-list">${(displayGuide.steps || []).map(step => `<li>${step}</li>`).join('')}</ol><div style="margin-top:10px;color:#94a3b8;">日常运用：${displayGuide.daily_use}</div></div></div>` : ''}`;
-      detail.querySelectorAll('[data-node]').forEach(el => el.addEventListener('click', () => select(nodeById.get(el.dataset.node))));
+      detail.innerHTML = `<span class="badge"><i class="dot" style="background:${colors[selected.type] || '#94a3b8'}"></i>${data.categories[selected.type] || selected.type}${selected.period ? ' · ' + selected.period : ''}</span><h3>${selected.name}</h3><p>${selected.summary || '暂无摘要'}</p>${relatedGuides.length ? `<div class="detail-section"><div class="detail-section-head"><h4>现实生活实践参考</h4><span class="badge">关联 ${relatedGuides.length} 条</span></div><div class="section-tip">这些建议与当前节点直接相关。点击卡片即可在右侧展开对应的小习惯、操作步骤和日常用法。</div><div class="practice-inline-list">${relatedGuides.map(guide => `<div class="practice-inline-card ${displayGuide?.id === guide.id ? 'active' : ''}" data-practice="${guide.id}"><div class="practice-kicker">实践参考</div><strong style="display:block;margin-top:6px;">${guide.title}</strong><div class="event-summary" style="margin-top:8px;">${guide.habit}</div><div class="practice-meta">适用场景：${guide.scenario}</div></div>`).join('')}</div></div>` : ''}<div class="detail-section"><div class="detail-section-head"><h4>直接关联</h4><span class="section-tip">点击条目可继续沿关系浏览</span></div><div class="relations">${rel.length ? rel.map(item => `<div class="relation" data-node="${item.other.id}"><strong>${item.relation}</strong> → ${item.other.name} <span style="color:#94a3b8">(${data.categories[item.other.type] || item.other.type})</span></div>`).join('') : '<div class="relation">暂无关联</div>'}</div></div>${displayGuide ? `<div class="detail-section"><div class="detail-section-head"><h4>${relatedGuides.length ? '当前展开的实践指南' : '当前选中的实践参考'}</h4><span class="section-tip">${displayGuide.scenario}</span></div><div class="practice-guide-card"><strong>${displayGuide.title}</strong><div style="margin-top:6px;color:#94a3b8;">适用场景：${displayGuide.scenario}</div><div style="margin-top:10px;">小习惯：${displayGuide.habit}</div><ol class="practice-guide-list">${(displayGuide.steps || []).map(step => `<li>${step}</li>`).join('')}</ol><div style="margin-top:10px;color:#94a3b8;">日常运用：${displayGuide.daily_use}</div></div></div>` : ''}`;
+      detail.querySelectorAll('[data-node]').forEach(el => el.addEventListener('click', () => select(nodeById.get(el.dataset.node), { focusGraph: true })));
       detail.querySelectorAll('[data-practice]').forEach(el => el.addEventListener('click', () => { selectedPracticeId = el.dataset.practice; renderPracticeList(); renderDetail(); }));
     }
+
     function renderGraph() {
-      const visible = new Set(data.nodes.filter(matches).map(n => n.id));
-      const nbs = neighborIds(selected.id);
+      if (!data) return;
+      const visible = getVisibleGraphNodeIds();
+      const visibleNodes = data.nodes.filter(node => visible.has(node.id));
+      const labelPlacements = computeLabelPlacements(visibleNodes);
+      const shouldFocusSelection = Boolean(selected && hasSelectionFocus && visible.has(selected.id));
+      const nbs = shouldFocusSelection ? neighborIds(selected.id) : visible;
       svg.innerHTML = '';
-      const gLinks = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      const gNodes = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      svg.append(gLinks, gNodes);
-      data.links.forEach(l => {
-        if (!visible.has(l.source) || !visible.has(l.target)) return;
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', l.s.x); line.setAttribute('y1', l.s.y); line.setAttribute('x2', l.t.x); line.setAttribute('y2', l.t.y);
-        line.setAttribute('class', `link ${nbs.has(l.source) && nbs.has(l.target) ? 'active' : selected ? 'dim' : ''}`);
-        line.addEventListener('click', () => select(l.s));
+      const viewportGroup = createSvg('g', { transform: getViewportTransform() });
+      const background = createSvg('rect', { x: 0, y: 0, width, height, fill: 'transparent', 'data-canvas-bg': 'true' });
+      background.addEventListener('pointerdown', event => {
+        panning = { startPoint: getSvgPoint(event), startViewport: { ...viewport } };
+        didPan = false;
+        svg.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        event.stopPropagation();
+      });
+      viewportGroup.appendChild(background);
+      const gLinks = createSvg('g');
+      const gNodes = createSvg('g');
+      viewportGroup.append(gLinks, gNodes);
+      svg.appendChild(viewportGroup);
+
+      data.links.forEach(link => {
+        if (!visible.has(link.source) || !visible.has(link.target)) return;
+        const line = createSvg('line', {
+          x1: link.s.x,
+          y1: link.s.y,
+          x2: link.t.x,
+          y2: link.t.y,
+          class: `link ${shouldFocusSelection && nbs.has(link.source) && nbs.has(link.target) ? 'active' : shouldFocusSelection ? 'dim' : ''}`
+        });
+        line.addEventListener('click', () => select(link.s, { focusGraph: true }));
         gLinks.appendChild(line);
       });
-      data.nodes.forEach(n => {
-        if (!visible.has(n.id)) return;
-        const active = nbs.has(n.id);
-        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        group.setAttribute('transform', `translate(${n.x},${n.y})`);
-        group.setAttribute('class', `node ${active ? '' : 'dim'}`);
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('r', sizes[n.type] + (n.id === selected.id ? 5 : 0));
-        circle.setAttribute('fill', colors[n.type]);
-        circle.setAttribute('stroke', n.id === selected.id ? '#fff' : 'rgba(255,255,255,.55)');
-        circle.setAttribute('stroke-width', n.id === selected.id ? '3' : '1.2');
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('x', sizes[n.type] + 7); label.setAttribute('y', 4); label.setAttribute('class', `label ${active ? '' : 'dim'}`); label.textContent = n.name;
+
+      visibleNodes.forEach(node => {
+        const active = !shouldFocusSelection || nbs.has(node.id);
+        const group = createSvg('g', {
+          transform: `translate(${node.x},${node.y})`,
+          class: `node ${active ? '' : 'dim'}`
+        });
+        const circle = createSvg('circle', {
+          r: sizes[node.type] + (node.id === selected?.id ? 5 : 0),
+          fill: colors[node.type],
+          stroke: node.id === selected?.id ? '#fff' : 'rgba(255,255,255,.55)',
+          'stroke-width': node.id === selected?.id ? '3' : '1.2'
+        });
+        const labelPlacement = labelPlacements.get(node.id) || { x: node.x + sizes[node.type] + 7, y: node.y + 4, anchor: 'start' };
+        const label = createSvg('text', {
+          x: labelPlacement.x - node.x,
+          y: labelPlacement.y - node.y,
+          class: `label ${active ? '' : 'dim'}`,
+          'text-anchor': labelPlacement.anchor
+        }, node.name);
         group.append(circle, label);
-        group.addEventListener('click', () => { if (!didDrag) select(n); });
-        group.addEventListener('pointerdown', e => { dragging = n; didDrag = false; n.fx = n.x; n.fy = n.y; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+        group.addEventListener('click', () => { if (!didDrag) select(node, { focusGraph: true }); });
+        group.addEventListener('pointerdown', event => {
+          dragging = {
+            node,
+            startPoint: getSvgPoint(event),
+            origin: { x: node.x, y: node.y }
+          };
+          didDrag = false;
+          svg.setPointerCapture(event.pointerId);
+          event.preventDefault();
+          event.stopPropagation();
+        });
         gNodes.appendChild(group);
       });
     }
+
     function tick() {
-      const visibleNodes = data.nodes.filter(matches);
-      for (let i = 0; i < visibleNodes.length; i++) for (let j = i + 1; j < visibleNodes.length; j++) {
-        const a = visibleNodes[i], b = visibleNodes[j];
-        let dx = a.x - b.x, dy = a.y - b.y, d2 = dx*dx + dy*dy + 0.01;
-        const f = Math.min(2200 / d2, 1.6); a.vx += dx * f * .01; a.vy += dy * f * .01; b.vx -= dx * f * .01; b.vy -= dy * f * .01;
+      const visibleIds = getVisibleGraphNodeIds();
+      const historyTargets = buildHistoryTargets(visibleIds);
+      const visibleNodes = data.nodes.filter(node => visibleIds.has(node.id));
+      for (let i = 0; i < visibleNodes.length; i += 1) {
+        for (let j = i + 1; j < visibleNodes.length; j += 1) {
+          const a = visibleNodes[i], b = visibleNodes[j];
+          let dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy + 0.01;
+          const f = Math.min(2200 / d2, 1.6);
+          a.vx += dx * f * .01; a.vy += dy * f * .01;
+          b.vx -= dx * f * .01; b.vy -= dy * f * .01;
+        }
       }
-      data.links.forEach(l => {
-        if (!matches(l.s) || !matches(l.t)) return;
-        const dx = l.t.x - l.s.x, dy = l.t.y - l.s.y, dist = Math.hypot(dx, dy) || 1, desired = 92;
-        const f = (dist - desired) * .006; l.s.vx += dx / dist * f; l.s.vy += dy / dist * f; l.t.vx -= dx / dist * f; l.t.vy -= dy / dist * f;
+      data.links.forEach(link => {
+        if (!visibleIds.has(link.source) || !visibleIds.has(link.target)) return;
+        const dx = link.t.x - link.s.x, dy = link.t.y - link.s.y, dist = Math.hypot(dx, dy) || 1, desired = 92;
+        const f = (dist - desired) * .006;
+        link.s.vx += dx / dist * f; link.s.vy += dy / dist * f;
+        link.t.vx -= dx / dist * f; link.t.vy -= dy / dist * f;
       });
-      data.nodes.forEach(n => {
-        const targetX = ({era:.12, school:.28, person:.46, work:.64, concept:.82}[n.type]) * width;
-        n.vx += (targetX - n.x) * .003; n.vy += (height/2 - n.y) * .001;
-        if (n !== dragging) { n.x += n.vx; n.y += n.vy; } else { n.x = n.fx; n.y = n.fy; }
-        n.vx *= .82; n.vy *= .82; n.x = Math.max(24, Math.min(width-150, n.x)); n.y = Math.max(34, Math.min(height-28, n.y));
+      data.nodes.forEach(node => {
+        const historyTarget = historyTargets?.get(node.id);
+        const targetX = historyTarget ? historyTarget.x : ({ era: .12, school: .30, person: .50, work: .68, concept: .84 }[node.type]) * width;
+        const targetY = historyTarget ? historyTarget.y : (DEFAULT_HISTORY_TYPES.has(node.type) ? height / 2 : height * 0.58);
+        node.vx += (targetX - node.x) * (historyTarget ? .007 : .003);
+        node.vy += (targetY - node.y) * (historyTarget ? .010 : .001);
+        if (!dragging || dragging.node !== node) {
+          node.x += node.vx;
+          node.y += node.vy;
+        }
+        node.vx *= .82;
+        node.vy *= .82;
+        clampNode(node);
       });
-      renderGraph(); requestAnimationFrame(tick);
+      renderGraph();
+      requestAnimationFrame(tick);
     }
-    function select(n) { if (!n) return; selected = n; const related = (data.practical_guides || []).find(guide => (guide.related_nodes || []).includes(n.id)); if (related) selectedPracticeId = related.id; renderDetail(); renderPracticeList(); renderGraph(); }
-    svg.addEventListener('pointermove', e => { if (!dragging) return; const r = svg.getBoundingClientRect(); dragging.fx = (e.clientX - r.left) * width / r.width; dragging.fy = (e.clientY - r.top) * height / r.height; dragging.vx = dragging.vy = 0; didDrag = true; });
-    svg.addEventListener('pointerup', e => { if (dragging) { dragging.x = dragging.fx; dragging.y = dragging.fy; dragging.fx = dragging.fy = null; try { svg.releasePointerCapture(e.pointerId); } catch (_) {} } setTimeout(() => { didDrag = false; }, 0); dragging = null; });
-    svg.addEventListener('pointercancel', () => { dragging = null; didDrag = false; });
-    search.addEventListener('input', () => { renderGraph(); renderPracticeList(); renderDetail(); });
-    document.getElementById('toolbar').addEventListener('click', e => {
-      if (e.target.tagName !== 'BUTTON') return;
-      filter = e.target.dataset.filter;
-      document.querySelectorAll('#toolbar button').forEach(b => b.classList.toggle('active', b === e.target));
-      renderGraph(); renderPracticeList(); renderDetail();
+
+    function select(node, options = {}) {
+      if (!node) return;
+      selected = node;
+      hasSelectionFocus = options.focusGraph ?? true;
+      const related = (data.practical_guides || []).find(guide => (guide.related_nodes || []).includes(node.id));
+      if (related) selectedPracticeId = related.id;
+      renderDetail();
+      renderPracticeList();
+      renderGraph();
+    }
+
+    svg.addEventListener('pointermove', event => {
+      if (panning) {
+        const point = getSvgPoint(event);
+        const moved = Math.hypot(point.x - panning.startPoint.x, point.y - panning.startPoint.y);
+        if (!didPan && moved < 6) return;
+        didPan = true;
+        viewport.tx = panning.startViewport.tx + (point.x - panning.startPoint.x);
+        viewport.ty = panning.startViewport.ty + (point.y - panning.startPoint.y);
+        renderGraph();
+        return;
+      }
+      if (!dragging) return;
+      const svgPoint = getSvgPoint(event);
+      const graphPoint = toGraphPoint(svgPoint);
+      const moved = Math.hypot(svgPoint.x - dragging.startPoint.x, svgPoint.y - dragging.startPoint.y);
+      if (!didDrag && moved < 4) return;
+      dragging.node.x = graphPoint.x;
+      dragging.node.y = graphPoint.y;
+      dragging.node.vx = 0;
+      dragging.node.vy = 0;
+      clampNode(dragging.node);
+      didDrag = true;
+      renderGraph();
     });
+
+    svg.addEventListener('pointerup', event => {
+      if (panning) {
+        try { svg.releasePointerCapture(event.pointerId); } catch (_) {}
+        preventBackgroundClick = didPan;
+        panning = null;
+        if (didPan) schedulePersistLayout();
+        didPan = false;
+        return;
+      }
+      const draggedNode = dragging?.node || null;
+      const shouldSelectNode = Boolean(draggedNode && !didDrag);
+      if (dragging) {
+        try { svg.releasePointerCapture(event.pointerId); } catch (_) {}
+      }
+      if (didDrag) schedulePersistLayout();
+      dragging = null;
+      didDrag = false;
+      if (shouldSelectNode) select(draggedNode, { focusGraph: true });
+    });
+
+    svg.addEventListener('pointercancel', () => {
+      dragging = null;
+      panning = null;
+      didDrag = false;
+      didPan = false;
+    });
+
+    svg.addEventListener('wheel', event => {
+      event.preventDefault();
+      const point = getSvgPoint(event);
+      const prevScale = viewport.scale;
+      const nextScale = Math.max(0.65, Math.min(2.5, prevScale * (event.deltaY < 0 ? 1.12 : 0.9)));
+      if (Math.abs(nextScale - prevScale) < 0.001) return;
+      const localX = (point.x - viewport.tx) / prevScale;
+      const localY = (point.y - viewport.ty) / prevScale;
+      viewport.scale = nextScale;
+      viewport.tx = point.x - localX * nextScale;
+      viewport.ty = point.y - localY * nextScale;
+      schedulePersistLayout();
+      renderGraph();
+    }, { passive: false });
+
+    svg.addEventListener('click', event => {
+      if (preventBackgroundClick) {
+        preventBackgroundClick = false;
+        return;
+      }
+      if (!(event.target === svg || event.target.getAttribute('data-canvas-bg') === 'true')) return;
+      selected = null;
+      hasSelectionFocus = false;
+      renderDetail();
+      renderPracticeList();
+      renderGraph();
+    });
+
+    search.addEventListener('input', () => {
+      hasSelectionFocus = false;
+      ensureSelectedVisible();
+      renderGraph();
+      renderPracticeList();
+      renderDetail();
+    });
+
+    document.getElementById('toolbar').addEventListener('click', event => {
+      if (event.target.tagName !== 'BUTTON') return;
+      filter = event.target.dataset.filter;
+      hasSelectionFocus = false;
+      ensureSelectedVisible();
+      document.querySelectorAll('#toolbar button').forEach(button => button.classList.toggle('active', button === event.target));
+      renderGraph();
+      renderPracticeList();
+      renderDetail();
+    });
+
     async function boot() {
       try {
+        resize();
         const response = await fetch('./graph.json');
         if (!response.ok) throw new Error('graph.json 加载失败');
         initData(await response.json());
-        renderStatic(); renderPracticeList(); renderDetail(); tick();
+        renderStatic();
+        renderPracticeList();
+        renderDetail();
+        renderGraph();
+        tick();
       } catch (error) {
         document.body.innerHTML = `<div style="padding:32px;color:#fff;font-family:sans-serif;line-height:1.8;">页面加载失败：${error.message}<br>请通过本地静态服务器或 GitHub Pages 打开页面。</div>`;
       }
     }
+
     boot();
   </script>
 </body>
