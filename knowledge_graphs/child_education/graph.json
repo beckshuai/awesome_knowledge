@@ -1,0 +1,816 @@
+{
+  "metadata": {
+    "title": "孩子教育跨学科知识图谱",
+    "topic": "儿童教育 / 养育 / 学习发展",
+    "domains": [
+      "心理学",
+      "人类学",
+      "脑科学"
+    ],
+    "language": "zh-CN",
+    "created_at": "2026-05-19",
+    "description": "围绕儿童教育主题整理的跨学科知识图谱，覆盖核心人物、主要观点、代表著作，以及概念之间的关系。"
+  },
+  "nodes": [
+    {
+      "id": "domain_psychology",
+      "type": "domain",
+      "name": "心理学",
+      "summary": "关注儿童认知、情绪、依恋、社会互动与学习机制。"
+    },
+    {
+      "id": "domain_anthropology",
+      "type": "domain",
+      "name": "人类学",
+      "summary": "关注不同文化中的儿童养育、社会化、共同体参与和学习方式。"
+    },
+    {
+      "id": "domain_neuroscience",
+      "type": "domain",
+      "name": "脑科学",
+      "summary": "关注儿童脑发育、神经可塑性、执行功能、语言学习与互动经验。"
+    },
+    {
+      "id": "person_piaget",
+      "type": "person",
+      "name": "Jean Piaget",
+      "name_zh": "让·皮亚杰",
+      "domain": "心理学",
+      "summary": "提出认知发展阶段论，强调儿童通过与环境互动主动建构知识。"
+    },
+    {
+      "id": "person_vygotsky",
+      "type": "person",
+      "name": "Lev Vygotsky",
+      "name_zh": "列夫·维果茨基",
+      "domain": "心理学",
+      "summary": "强调社会互动、语言与文化工具在儿童认知发展中的中介作用。"
+    },
+    {
+      "id": "person_bowlby",
+      "type": "person",
+      "name": "John Bowlby",
+      "name_zh": "约翰·鲍尔比",
+      "domain": "心理学",
+      "summary": "依恋理论提出者，强调稳定照护关系对儿童安全感与探索行为的重要性。"
+    },
+    {
+      "id": "person_ainsworth",
+      "type": "person",
+      "name": "Mary Ainsworth",
+      "name_zh": "玛丽·安斯沃思",
+      "domain": "心理学",
+      "summary": "扩展依恋理论，强调照护者敏感性与陌生情境研究。"
+    },
+    {
+      "id": "person_rogoff",
+      "type": "person",
+      "name": "Barbara Rogoff",
+      "name_zh": "芭芭拉·罗格夫",
+      "domain": "人类学",
+      "summary": "将心理学与人类学结合，强调儿童在家庭、社区与共同活动中的学习。"
+    },
+    {
+      "id": "person_mead",
+      "type": "person",
+      "name": "Margaret Mead",
+      "name_zh": "玛格丽特·米德",
+      "domain": "人类学",
+      "summary": "强调儿童发展、青春期与性别角色受到文化塑造，而非纯粹生物决定。"
+    },
+    {
+      "id": "person_hrdy",
+      "type": "person",
+      "name": "Sarah Hrdy",
+      "name_zh": "莎拉·赫尔迪",
+      "domain": "人类学",
+      "summary": "提出合作抚育与多照护者支持对人类婴幼儿成长和社会性发展的重要性。"
+    },
+    {
+      "id": "person_kuhl",
+      "type": "person",
+      "name": "Patricia K. Kuhl",
+      "name_zh": "帕特里夏·库尔",
+      "domain": "脑科学",
+      "summary": "研究婴儿语言学习与脑发育，强调早期语言输入和社会互动的重要性。"
+    },
+    {
+      "id": "person_diamond",
+      "type": "person",
+      "name": "Adele Diamond",
+      "name_zh": "阿黛尔·戴蒙德",
+      "domain": "脑科学",
+      "summary": "研究儿童执行功能、自我调节与前额叶发育，强调可通过教育干预提升。"
+    },
+    {
+      "id": "concept_constructivism",
+      "type": "concept",
+      "name": "主动建构学习",
+      "domain": "心理学",
+      "summary": "儿童不是被动接受知识，而是在探索、操作、提问和反馈中建构理解。"
+    },
+    {
+      "id": "concept_stages",
+      "type": "concept",
+      "name": "认知发展阶段",
+      "domain": "心理学",
+      "summary": "感知运动、前运算、具体运算、形式运算四阶段提示教学应考虑发展准备度。"
+    },
+    {
+      "id": "concept_zpd",
+      "type": "concept",
+      "name": "最近发展区",
+      "domain": "心理学",
+      "summary": "儿童独立能力与在支持下可达到能力之间的区域，是教学设计的重要抓手。"
+    },
+    {
+      "id": "concept_scaffolding",
+      "type": "concept",
+      "name": "支架式支持",
+      "domain": "心理学",
+      "summary": "成人或更有经验者通过示范、提问、提示与分步帮助推动儿童向更高水平发展。"
+    },
+    {
+      "id": "concept_attachment",
+      "type": "concept",
+      "name": "依恋安全基地",
+      "domain": "心理学",
+      "summary": "稳定、可得、敏感的照护关系为儿童探索世界提供安全基础。"
+    },
+    {
+      "id": "concept_sensitive_care",
+      "type": "concept",
+      "name": "敏感回应式照护",
+      "domain": "心理学",
+      "summary": "高质量互动比单纯陪伴时长更关键，及时准确回应孩子信号是核心。"
+    },
+    {
+      "id": "concept_guided_participation",
+      "type": "concept",
+      "name": "引导式参与",
+      "domain": "人类学",
+      "summary": "儿童通过参与家庭、社区、劳动与共同体实践来学习，而不仅依赖课堂讲授。"
+    },
+    {
+      "id": "concept_cultural_learning",
+      "type": "concept",
+      "name": "文化塑造的发展",
+      "domain": "人类学",
+      "summary": "儿童成长、青春期经验、性别角色与学习方式都受文化情境塑造。"
+    },
+    {
+      "id": "concept_cooperative_breeding",
+      "type": "concept",
+      "name": "合作抚育",
+      "domain": "人类学",
+      "summary": "人类幼儿成长依赖母亲之外的父亲、祖辈、手足、照护者与社区支持。"
+    },
+    {
+      "id": "concept_serve_return",
+      "type": "concept",
+      "name": "你来我往互动（Serve and Return）",
+      "domain": "脑科学",
+      "summary": "孩子发出信号、成人及时回应的互动，会塑造神经连接并支持语言、情绪与社会发展。"
+    },
+    {
+      "id": "concept_brain_architecture",
+      "type": "concept",
+      "name": "脑架构与可塑性",
+      "domain": "脑科学",
+      "summary": "大脑先搭基础回路再发展复杂能力，早期经验会通过建立与修剪连接影响后续学习与健康。"
+    },
+    {
+      "id": "concept_exec_function",
+      "type": "concept",
+      "name": "执行功能",
+      "domain": "脑科学",
+      "summary": "包含抑制控制、工作记忆、认知灵活性，是学习、自我调节与任务管理的重要基础。"
+    },
+    {
+      "id": "concept_early_language",
+      "type": "concept",
+      "name": "早期语言暴露",
+      "domain": "脑科学",
+      "summary": "婴幼儿早期语言输入及其社会互动质量会改变语言加工系统的发展轨迹。"
+    },
+    {
+      "id": "work_piaget_child_thought",
+      "type": "work",
+      "name": "The Language and Thought of the Child",
+      "author": "Jean Piaget",
+      "domain": "心理学"
+    },
+    {
+      "id": "work_piaget_future_education",
+      "type": "work",
+      "name": "To Understand Is to Invent: The Future of Education",
+      "author": "Jean Piaget",
+      "domain": "心理学"
+    },
+    {
+      "id": "work_vygotsky_thinking_speech",
+      "type": "work",
+      "name": "Thinking and Speech",
+      "author": "Lev Vygotsky",
+      "domain": "心理学"
+    },
+    {
+      "id": "work_vygotsky_mind_society",
+      "type": "work",
+      "name": "Mind in Society: The Development of Higher Psychological Processes",
+      "author": "Lev Vygotsky",
+      "domain": "心理学"
+    },
+    {
+      "id": "work_bowlby_attachment_loss",
+      "type": "work",
+      "name": "Attachment and Loss",
+      "author": "John Bowlby",
+      "domain": "心理学"
+    },
+    {
+      "id": "work_ainsworth_patterns",
+      "type": "work",
+      "name": "Patterns of Attachment: A Psychological Study of the Strange Situation",
+      "author": "Mary Ainsworth et al.",
+      "domain": "心理学"
+    },
+    {
+      "id": "work_rogoff_cultural_nature",
+      "type": "work",
+      "name": "The Cultural Nature of Human Development",
+      "author": "Barbara Rogoff",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_rogoff_learning_together",
+      "type": "work",
+      "name": "Learning Together: Children and Adults in a School Community",
+      "author": "Barbara Rogoff",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_mead_samoa",
+      "type": "work",
+      "name": "Coming of Age in Samoa",
+      "author": "Margaret Mead",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_mead_growing_up_ng",
+      "type": "work",
+      "name": "Growing Up in New Guinea",
+      "author": "Margaret Mead",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_mead_sex_temperament",
+      "type": "work",
+      "name": "Sex and Temperament in Three Primitive Societies",
+      "author": "Margaret Mead",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_hrdy_mother_nature",
+      "type": "work",
+      "name": "Mother Nature: A History of Mothers, Infants and Natural Selection",
+      "author": "Sarah Hrdy",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_hrdy_mothers_others",
+      "type": "work",
+      "name": "Mothers and Others: The Evolutionary Origins of Mutual Understanding",
+      "author": "Sarah Hrdy",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_hrdy_father_time",
+      "type": "work",
+      "name": "Father Time: A Natural History of Men and Babies",
+      "author": "Sarah Hrdy",
+      "domain": "人类学"
+    },
+    {
+      "id": "work_kuhl_nlm",
+      "type": "work",
+      "name": "Native Language Magnet / Neural Commitment Theory",
+      "author": "Patricia K. Kuhl",
+      "domain": "脑科学"
+    },
+    {
+      "id": "work_kuhl_ted",
+      "type": "work",
+      "name": "The linguistic genius of babies",
+      "author": "Patricia K. Kuhl",
+      "domain": "脑科学"
+    },
+    {
+      "id": "work_diamond_exec_functions",
+      "type": "work",
+      "name": "Executive Functions",
+      "author": "Adele Diamond",
+      "domain": "脑科学"
+    },
+    {
+      "id": "work_diamond_interventions",
+      "type": "work",
+      "name": "Interventions Shown to Aid Executive Function Development in Children 4–12 Years Old",
+      "author": "Adele Diamond",
+      "domain": "脑科学"
+    },
+    {
+      "id": "work_harvard_exec",
+      "type": "work",
+      "name": "Executive Function",
+      "author": "Center on the Developing Child at Harvard University",
+      "domain": "脑科学"
+    },
+    {
+      "id": "work_harvard_serve_return",
+      "type": "work",
+      "name": "Serve and Return Interaction Shapes Brain Circuitry",
+      "author": "Center on the Developing Child at Harvard University",
+      "domain": "脑科学"
+    },
+    {
+      "id": "work_harvard_brain_architecture",
+      "type": "work",
+      "name": "Brain Architecture",
+      "author": "Center on the Developing Child at Harvard University",
+      "domain": "脑科学"
+    }
+  ],
+  "edges": [
+    {
+      "source": "person_piaget",
+      "target": "domain_psychology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_piaget",
+      "target": "concept_constructivism",
+      "relation": "proposed"
+    },
+    {
+      "source": "person_piaget",
+      "target": "concept_stages",
+      "relation": "proposed"
+    },
+    {
+      "source": "person_piaget",
+      "target": "work_piaget_child_thought",
+      "relation": "authored"
+    },
+    {
+      "source": "person_piaget",
+      "target": "work_piaget_future_education",
+      "relation": "authored"
+    },
+    {
+      "source": "concept_constructivism",
+      "target": "concept_stages",
+      "relation": "implemented_with_attention_to"
+    },
+    {
+      "source": "person_vygotsky",
+      "target": "domain_psychology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_vygotsky",
+      "target": "concept_zpd",
+      "relation": "proposed"
+    },
+    {
+      "source": "person_vygotsky",
+      "target": "concept_scaffolding",
+      "relation": "inspired"
+    },
+    {
+      "source": "person_vygotsky",
+      "target": "work_vygotsky_thinking_speech",
+      "relation": "authored"
+    },
+    {
+      "source": "person_vygotsky",
+      "target": "work_vygotsky_mind_society",
+      "relation": "authored"
+    },
+    {
+      "source": "concept_zpd",
+      "target": "concept_scaffolding",
+      "relation": "operationalized_by"
+    },
+    {
+      "source": "person_bowlby",
+      "target": "domain_psychology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_ainsworth",
+      "target": "domain_psychology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_bowlby",
+      "target": "concept_attachment",
+      "relation": "proposed"
+    },
+    {
+      "source": "person_ainsworth",
+      "target": "concept_sensitive_care",
+      "relation": "refined"
+    },
+    {
+      "source": "concept_sensitive_care",
+      "target": "concept_attachment",
+      "relation": "supports"
+    },
+    {
+      "source": "person_bowlby",
+      "target": "work_bowlby_attachment_loss",
+      "relation": "authored"
+    },
+    {
+      "source": "person_ainsworth",
+      "target": "work_ainsworth_patterns",
+      "relation": "authored"
+    },
+    {
+      "source": "person_rogoff",
+      "target": "domain_anthropology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_rogoff",
+      "target": "concept_guided_participation",
+      "relation": "proposed"
+    },
+    {
+      "source": "person_rogoff",
+      "target": "concept_cultural_learning",
+      "relation": "developed"
+    },
+    {
+      "source": "person_rogoff",
+      "target": "work_rogoff_cultural_nature",
+      "relation": "authored"
+    },
+    {
+      "source": "person_rogoff",
+      "target": "work_rogoff_learning_together",
+      "relation": "authored"
+    },
+    {
+      "source": "person_mead",
+      "target": "domain_anthropology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_mead",
+      "target": "concept_cultural_learning",
+      "relation": "evidenced"
+    },
+    {
+      "source": "person_mead",
+      "target": "work_mead_samoa",
+      "relation": "authored"
+    },
+    {
+      "source": "person_mead",
+      "target": "work_mead_growing_up_ng",
+      "relation": "authored"
+    },
+    {
+      "source": "person_mead",
+      "target": "work_mead_sex_temperament",
+      "relation": "authored"
+    },
+    {
+      "source": "person_hrdy",
+      "target": "domain_anthropology",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_hrdy",
+      "target": "concept_cooperative_breeding",
+      "relation": "proposed"
+    },
+    {
+      "source": "person_hrdy",
+      "target": "work_hrdy_mother_nature",
+      "relation": "authored"
+    },
+    {
+      "source": "person_hrdy",
+      "target": "work_hrdy_mothers_others",
+      "relation": "authored"
+    },
+    {
+      "source": "person_hrdy",
+      "target": "work_hrdy_father_time",
+      "relation": "authored"
+    },
+    {
+      "source": "person_kuhl",
+      "target": "domain_neuroscience",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_kuhl",
+      "target": "concept_early_language",
+      "relation": "developed"
+    },
+    {
+      "source": "person_kuhl",
+      "target": "work_kuhl_nlm",
+      "relation": "authored"
+    },
+    {
+      "source": "person_kuhl",
+      "target": "work_kuhl_ted",
+      "relation": "presented"
+    },
+    {
+      "source": "person_diamond",
+      "target": "domain_neuroscience",
+      "relation": "belongs_to"
+    },
+    {
+      "source": "person_diamond",
+      "target": "concept_exec_function",
+      "relation": "synthesized"
+    },
+    {
+      "source": "person_diamond",
+      "target": "work_diamond_exec_functions",
+      "relation": "authored"
+    },
+    {
+      "source": "person_diamond",
+      "target": "work_diamond_interventions",
+      "relation": "authored"
+    },
+    {
+      "source": "concept_serve_return",
+      "target": "concept_brain_architecture",
+      "relation": "shapes"
+    },
+    {
+      "source": "concept_brain_architecture",
+      "target": "concept_exec_function",
+      "relation": "supports_foundation_for"
+    },
+    {
+      "source": "concept_early_language",
+      "target": "concept_serve_return",
+      "relation": "strengthened_by"
+    },
+    {
+      "source": "work_harvard_exec",
+      "target": "concept_exec_function",
+      "relation": "documents"
+    },
+    {
+      "source": "work_harvard_serve_return",
+      "target": "concept_serve_return",
+      "relation": "documents"
+    },
+    {
+      "source": "work_harvard_brain_architecture",
+      "target": "concept_brain_architecture",
+      "relation": "documents"
+    },
+    {
+      "source": "concept_attachment",
+      "target": "concept_serve_return",
+      "relation": "reinforced_by"
+    },
+    {
+      "source": "concept_guided_participation",
+      "target": "concept_scaffolding",
+      "relation": "complements"
+    },
+    {
+      "source": "concept_cultural_learning",
+      "target": "concept_cooperative_breeding",
+      "relation": "contextualizes"
+    },
+    {
+      "source": "concept_exec_function",
+      "target": "concept_constructivism",
+      "relation": "enables"
+    }
+  ],
+  "domain_overviews": {
+    "心理学": {
+      "核心问题": [
+        "孩子如何理解世界？",
+        "成人支持如何促进学习？",
+        "安全关系如何影响探索与情绪调节？"
+      ],
+      "关键主张": [
+        "教学要匹配发展阶段。",
+        "学习通过互动和支架得到提升。",
+        "稳定敏感的照护是学习与探索的心理基础。"
+      ]
+    },
+    "人类学": {
+      "核心问题": [
+        "不同文化如何养育孩子？",
+        "孩子如何在家庭与社区实践中学习？",
+        "谁在参与抚育与社会化？"
+      ],
+      "关键主张": [
+        "没有单一普遍正确的育儿模型。",
+        "儿童学习常发生在共同体参与中。",
+        "多照护者和文化环境会显著影响发展路径。"
+      ]
+    },
+    "脑科学": {
+      "核心问题": [
+        "早期经验如何塑造大脑？",
+        "执行功能如何影响学习？",
+        "为什么互动式语言环境很重要？"
+      ],
+      "关键主张": [
+        "早期脑可塑性很强，互动经验会改变神经连接。",
+        "执行功能是学习能力的重要底层机制。",
+        "语言暴露与社会互动共同推动语言脑系统发展。"
+      ]
+    }
+  },
+  "development_tracks": [
+    {
+      "id": "track_psychology",
+      "domain": "心理学",
+      "title": "从认知建构到关系支持",
+      "summary": "儿童教育心理学的主线，从儿童主动建构知识，到社会互动支持，再到安全关系与情绪调节基础。",
+      "stages": [
+        {
+          "year": "1920s-1930s",
+          "title": "认知建构与发展阶段",
+          "summary": "Piaget 强调儿童通过行动、试错与图式调整来建构知识，教学应匹配发展准备度。",
+          "node_refs": [
+            "person_piaget",
+            "concept_constructivism",
+            "concept_stages",
+            "work_piaget_child_thought",
+            "work_piaget_future_education"
+          ]
+        },
+        {
+          "year": "1930s",
+          "title": "社会互动与最近发展区",
+          "summary": "Vygotsky 将学习理解为社会互动中的发展过程，提出最近发展区与文化工具的重要性。",
+          "node_refs": [
+            "person_vygotsky",
+            "concept_zpd",
+            "concept_scaffolding",
+            "work_vygotsky_thinking_speech",
+            "work_vygotsky_mind_society"
+          ]
+        },
+        {
+          "year": "1950s-1970s",
+          "title": "依恋、安全感与探索",
+          "summary": "Bowlby 与 Ainsworth 强调稳定、敏感的照护关系，为儿童探索、情绪调节与学习提供安全基地。",
+          "node_refs": [
+            "person_bowlby",
+            "person_ainsworth",
+            "concept_attachment",
+            "concept_sensitive_care",
+            "work_bowlby_attachment_loss",
+            "work_ainsworth_patterns"
+          ]
+        },
+        {
+          "year": "1980s-至今",
+          "title": "整合式儿童教育观",
+          "summary": "当代实践更强调把主动学习、互动支持和情绪安全整合到同一教育设计中。",
+          "node_refs": [
+            "concept_constructivism",
+            "concept_scaffolding",
+            "concept_attachment",
+            "concept_sensitive_care"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "track_anthropology",
+      "domain": "人类学",
+      "title": "从文化差异到共同体学习",
+      "summary": "儿童教育的人类学主线，从文化塑造与跨文化比较，走向家庭、社区和多照护者网络中的学习。",
+      "stages": [
+        {
+          "year": "1928-1935",
+          "title": "文化塑造的成长路径",
+          "summary": "Mead 用跨文化研究说明，青春期体验、性别角色与社会化路径并非天然固定。",
+          "node_refs": [
+            "person_mead",
+            "concept_cultural_learning",
+            "work_mead_samoa",
+            "work_mead_growing_up_ng",
+            "work_mead_sex_temperament"
+          ]
+        },
+        {
+          "year": "1990s-2000s",
+          "title": "共同活动中的学习",
+          "summary": "Rogoff 强调儿童通过家庭、社区、劳动与协作实践来学习，学校不是唯一学习场。",
+          "node_refs": [
+            "person_rogoff",
+            "concept_guided_participation",
+            "concept_cultural_learning",
+            "work_rogoff_cultural_nature",
+            "work_rogoff_learning_together"
+          ]
+        },
+        {
+          "year": "1999-2024",
+          "title": "合作抚育与多照护者网络",
+          "summary": "Hrdy 从演化人类学出发强调父亲、祖辈、手足与社区支持对儿童成长和社会理解能力的重要性。",
+          "node_refs": [
+            "person_hrdy",
+            "concept_cooperative_breeding",
+            "work_hrdy_mother_nature",
+            "work_hrdy_mothers_others",
+            "work_hrdy_father_time"
+          ]
+        },
+        {
+          "year": "当代",
+          "title": "情境化家庭教育",
+          "summary": "当代理解更重视在文化、资源、家庭结构和社区支持系统中理解孩子的发展。",
+          "node_refs": [
+            "concept_guided_participation",
+            "concept_cultural_learning",
+            "concept_cooperative_breeding"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "track_neuroscience",
+      "domain": "脑科学",
+      "title": "从脑可塑性到执行功能训练",
+      "summary": "儿童脑科学主线，从早期脑架构和互动式养育，发展到语言学习与执行功能训练的教育应用。",
+      "stages": [
+        {
+          "year": "1990s-2000s",
+          "title": "早期脑架构与可塑性",
+          "summary": "早期经验通过神经连接的建立与修剪塑造大脑，为后续学习、行为与健康打底。",
+          "node_refs": [
+            "concept_brain_architecture",
+            "work_harvard_brain_architecture"
+          ]
+        },
+        {
+          "year": "2000s",
+          "title": "婴儿语言学习的关键期",
+          "summary": "Kuhl 强调早期语言暴露与社会互动会影响大脑对母语语音和语言模式的专门化。",
+          "node_refs": [
+            "person_kuhl",
+            "concept_early_language",
+            "work_kuhl_nlm",
+            "work_kuhl_ted"
+          ]
+        },
+        {
+          "year": "2010s",
+          "title": "执行功能与自我调节",
+          "summary": "Diamond 将执行功能研究与教育干预相连接，强调抑制、工作记忆与灵活切换可被有意识训练。",
+          "node_refs": [
+            "person_diamond",
+            "concept_exec_function",
+            "work_diamond_exec_functions",
+            "work_diamond_interventions",
+            "work_harvard_exec"
+          ]
+        },
+        {
+          "year": "持续发展中",
+          "title": "互动养育与长期发展",
+          "summary": "Serve and Return 说明温暖、及时、稳定的回应式互动，会持续支持语言、情绪与社会发展。",
+          "node_refs": [
+            "concept_serve_return",
+            "concept_brain_architecture",
+            "concept_exec_function",
+            "work_harvard_serve_return"
+          ]
+        }
+      ]
+    }
+  ],
+  "practical_implications": [
+    "把儿童看作主动学习者，多用探索、操作、游戏、讨论，而不是单向灌输。",
+    "把教学任务设计在孩子的最近发展区，给到适度支持，再逐步撤去支架。",
+    "优先建设稳定、敏感、可回应的关系环境，让孩子在安全感中探索。",
+    "尊重文化差异与家庭现实，不把单一中产课堂模式当成普遍标准。",
+    "重视父亲、祖辈、照护者与社区，建立多成人支持网络。",
+    "在日常生活中训练执行功能：等待、计划、切换、坚持、完成任务。",
+    "用高频、温暖、来回互动的语言环境支持脑发育和语言学习。"
+  ]
+}

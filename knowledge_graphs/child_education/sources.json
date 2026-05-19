@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "title": "孩子教育知识图谱资料来源",
+    "created_at": "2026-05-19",
+    "description": "用于构建 child_education/graph.json 的网页资料来源与用途说明。"
+  },
+  "sources": [
+    {
+      "id": "src_piaget",
+      "title": "Jean Piaget",
+      "url": "https://en.wikipedia.org/wiki/Jean_Piaget",
+      "used_for": [
+        "认知发展阶段",
+        "主动建构学习",
+        "代表著作"
+      ]
+    },
+    {
+      "id": "src_vygotsky",
+      "title": "Lev Vygotsky",
+      "url": "https://en.wikipedia.org/wiki/Lev_Vygotsky",
+      "used_for": [
+        "最近发展区",
+        "支架式支持",
+        "语言与社会互动"
+      ]
+    },
+    {
+      "id": "src_attachment",
+      "title": "Attachment theory",
+      "url": "https://en.wikipedia.org/wiki/Attachment_theory",
+      "used_for": [
+        "依恋安全基地",
+        "敏感回应式照护",
+        "Bowlby 与 Ainsworth 代表著作"
+      ]
+    },
+    {
+      "id": "src_rogoff",
+      "title": "Barbara Rogoff",
+      "url": "https://en.wikipedia.org/wiki/Barbara_Rogoff",
+      "used_for": [
+        "引导式参与",
+        "文化中的学习",
+        "代表著作"
+      ]
+    },
+    {
+      "id": "src_mead",
+      "title": "Margaret Mead",
+      "url": "https://en.wikipedia.org/wiki/Margaret_Mead",
+      "used_for": [
+        "文化塑造的发展",
+        "青春期与性别角色",
+        "代表著作"
+      ]
+    },
+    {
+      "id": "src_hrdy",
+      "title": "Sarah Hrdy",
+      "url": "https://en.wikipedia.org/wiki/Sarah_Hrdy",
+      "used_for": [
+        "合作抚育",
+        "多照护者支持",
+        "代表著作"
+      ]
+    },
+    {
+      "id": "src_kuhl",
+      "title": "Patricia K. Kuhl",
+      "url": "https://en.wikipedia.org/wiki/Patricia_K._Kuhl",
+      "used_for": [
+        "早期语言暴露",
+        "语言脑发育",
+        "代表性理论与公开演讲"
+      ]
+    },
+    {
+      "id": "src_diamond",
+      "title": "Adele Diamond",
+      "url": "https://en.wikipedia.org/wiki/Adele_Diamond",
+      "used_for": [
+        "执行功能",
+        "教育干预",
+        "代表论文"
+      ]
+    },
+    {
+      "id": "src_harvard_exec",
+      "title": "Executive Function",
+      "url": "https://developingchild.harvard.edu/science/key-concepts/executive-function/",
+      "used_for": [
+        "执行功能定义",
+        "教育启发",
+        "儿童日常训练"
+      ]
+    },
+    {
+      "id": "src_harvard_serve_return",
+      "title": "Serve and Return",
+      "url": "https://developingchild.harvard.edu/science/key-concepts/serve-and-return/",
+      "used_for": [
+        "互动式照护",
+        "神经连接塑造",
+        "语言与情绪发展"
+      ]
+    },
+    {
+      "id": "src_harvard_brain_architecture",
+      "title": "Brain Architecture",
+      "url": "https://developingchild.harvard.edu/science/key-concepts/brain-architecture/",
+      "used_for": [
+        "脑架构与可塑性",
+        "早期经验的重要性",
+        "神经连接建立与修剪"
+      ]
+    }
+  ]
+}

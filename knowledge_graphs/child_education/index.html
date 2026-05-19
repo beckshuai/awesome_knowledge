@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>孩子教育知识图谱</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #121a2f;
+        --panel-2: #18223e;
+        --line: rgba(148, 163, 184, 0.2);
+        --text: #e5eefc;
+        --muted: #94a3b8;
+        --blue: #4ea1ff;
+        --green: #46d6a9;
+        --orange: #ffb454;
+        --purple: #b084ff;
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #16254a, var(--bg) 44%);
+        color: var(--text);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .hero {
+        padding: 24px 28px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(78, 161, 255, 0.16), rgba(176, 132, 255, 0.08));
+        box-shadow: var(--shadow);
+      }
+
+      .hero h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        line-height: 1.2;
+      }
+
+      .hero p {
+        margin: 0;
+        color: #c7d6ef;
+        line-height: 1.7;
+      }
+
+      .subnote {
+        margin-top: 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .stats {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .stat-card,
+      .panel,
+      .control-group,
+      .track-card,
+      .relation-card,
+      .legend,
+      .empty,
+      .source-card {
+        border: 1px solid var(--line);
+        background: rgba(18, 26, 47, 0.88);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .stat-card {
+        padding: 16px 18px;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .stat-value {
+        margin-top: 8px;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .controls {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 12px;
+      }
+
+      .control-group {
+        padding: 14px 16px;
+      }
+
+      .control-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .control-group input,
+      .control-group select {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        background: rgba(12, 18, 34, 0.95);
+        color: var(--text);
+        padding: 12px 14px;
+        font-size: 14px;
+        outline: none;
+      }
+
+      .tabs {
+        margin-top: 18px;
+        display: inline-flex;
+        padding: 6px;
+        border-radius: 16px;
+        background: rgba(18, 26, 47, 0.86);
+        border: 1px solid var(--line);
+      }
+
+      .tab-btn {
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        padding: 12px 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s ease;
+      }
+
+      .tab-btn.active {
+        background: rgba(78, 161, 255, 0.18);
+        color: var(--text);
+      }
+
+      .layout {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.8fr) 360px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .panel-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .panel-title h2,
+      .detail-title {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .panel-title span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      #graphSvg {
+        width: 100%;
+        height: 760px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(12, 18, 34, 0.95), rgba(18, 26, 47, 0.95));
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+
+      .domain-label {
+        font-size: 14px;
+        font-weight: 600;
+        fill: #dfe9ff;
+      }
+
+      .lane-label {
+        font-size: 12px;
+        fill: #7f93b2;
+      }
+
+      .edge {
+        stroke: rgba(148, 163, 184, 0.22);
+        stroke-width: 1.2;
+        transition: 0.2s ease;
+      }
+
+      .edge.active {
+        stroke: rgba(255, 180, 84, 0.88);
+        stroke-width: 2.6;
+      }
+
+      .node {
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .node circle {
+        transition: 0.2s ease;
+      }
+
+      .node text {
+        fill: #dfe9ff;
+        font-size: 11px;
+        text-anchor: middle;
+        pointer-events: none;
+      }
+
+      .node.active circle {
+        stroke: #fff7d6;
+        stroke-width: 3;
+      }
+
+      .node.dimmed {
+        opacity: 0.28;
+      }
+
+      .edge.dimmed {
+        opacity: 0.14;
+      }
+
+      .legend {
+        margin-top: 12px;
+        padding: 14px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 16px;
+      }
+
+      .legend-item,
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #dce8ff;
+        font-size: 13px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+      }
+
+      .timeline-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .track-card {
+        padding: 18px;
+      }
+
+      .track-header {
+        margin-bottom: 14px;
+      }
+
+      .track-header h3 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+
+      .track-header p {
+        margin: 0;
+        color: #bfd0ee;
+        line-height: 1.6;
+      }
+
+      .track-stages {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .stage-card {
+        padding: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 14px;
+        background: rgba(12, 18, 34, 0.75);
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .stage-card:hover,
+      .stage-card.active {
+        transform: translateY(-2px);
+        border-color: rgba(255, 180, 84, 0.72);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+      }
+
+      .stage-year {
+        color: var(--orange);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .stage-title {
+        margin-top: 8px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .stage-summary {
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #bfd0ee;
+      }
+
+      .relation-layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .node-list {
+        max-height: 720px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .node-list-item {
+        padding: 12px 14px;
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 14px;
+        background: rgba(12, 18, 34, 0.7);
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .node-list-item.active {
+        border-color: rgba(78, 161, 255, 0.72);
+        background: rgba(78, 161, 255, 0.14);
+      }
+
+      .node-list-item small {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+      }
+
+      .relation-card {
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+
+      .relation-card h4 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      .relation-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(12, 18, 34, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        cursor: pointer;
+      }
+
+      .chip small {
+        color: var(--muted);
+      }
+
+      .detail-title-wrap {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .detail-sub {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .detail-summary {
+        margin-top: 14px;
+        line-height: 1.75;
+        color: #dce8ff;
+      }
+
+      .detail-section {
+        margin-top: 18px;
+      }
+
+      .detail-section h4 {
+        margin: 0 0 10px;
+        font-size: 14px;
+      }
+
+      .detail-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .detail-item,
+      .source-card,
+      .empty {
+        padding: 12px 14px;
+      }
+
+      .detail-item {
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 14px;
+        background: rgba(12, 18, 34, 0.78);
+      }
+
+      .detail-item strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .detail-item p {
+        margin: 0;
+        color: #bfd0ee;
+        line-height: 1.6;
+        font-size: 13px;
+      }
+
+      .empty {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 1120px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .relation-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .stats,
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .page {
+          padding: 16px;
+        }
+
+        .hero h1 {
+          font-size: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <h1>孩子教育知识图谱 · 交互视图</h1>
+        <p>
+          这个页面把知识图谱、发展轨迹、关联关系放在同一个可交互界面里。你可以按学科筛选、按类型过滤、搜索人物/观点/著作，并点击节点查看它与其他概念的连接方式。
+        </p>
+        <div class="subnote">
+          建议通过本地静态服务器访问，例如在当前目录执行：<code>python3 -m http.server 8000</code>，然后打开 <code>http://localhost:8000</code>。
+        </div>
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="controls">
+        <div class="control-group">
+          <label for="searchInput">搜索节点</label>
+          <input id="searchInput" type="text" placeholder="输入人物、观点、著作或关键词" />
+        </div>
+        <div class="control-group">
+          <label for="domainSelect">学科筛选</label>
+          <select id="domainSelect">
+            <option value="全部">全部学科</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="typeSelect">节点类型</label>
+          <select id="typeSelect">
+            <option value="全部">全部类型</option>
+            <option value="domain">学科域</option>
+            <option value="person">人物</option>
+            <option value="concept">观点/概念</option>
+            <option value="work">著作/作品</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" data-tab="graph">知识图谱</button>
+        <button class="tab-btn" data-tab="timeline">发展轨迹</button>
+        <button class="tab-btn" data-tab="relations">关联关系</button>
+      </div>
+
+      <section class="layout">
+        <div>
+          <div class="panel view active" id="view-graph">
+            <div class="panel-title">
+              <h2>知识图谱</h2>
+              <span>点击节点可高亮其直接关联</span>
+            </div>
+            <svg id="graphSvg" viewBox="0 0 1180 760"></svg>
+            <div class="legend" id="graphLegend"></div>
+          </div>
+
+          <div class="panel view" id="view-timeline">
+            <div class="panel-title">
+              <h2>发展轨迹</h2>
+              <span>按学科查看核心思想如何演变</span>
+            </div>
+            <div class="timeline-grid" id="timelineGrid"></div>
+          </div>
+
+          <div class="panel view" id="view-relations">
+            <div class="panel-title">
+              <h2>关联关系</h2>
+              <span>选一个节点，查看它连向谁、被谁指向</span>
+            </div>
+            <div class="relation-layout">
+              <div class="node-list" id="relationNodeList"></div>
+              <div id="relationInspector"></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel" id="detailPanel">
+          <div class="detail-title-wrap">
+            <div>
+              <h3 class="detail-title">说明面板</h3>
+              <div class="detail-sub">点击图谱节点或发展阶段查看详细说明</div>
+            </div>
+          </div>
+          <div class="empty" id="detailContent">
+            这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作与关系说明。
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <script>
+      const TYPE_LABELS = {
+        domain: '学科域',
+        person: '人物',
+        concept: '观点/概念',
+        work: '著作/作品'
+      };
+
+      const TYPE_ORDER = ['domain', 'person', 'concept', 'work'];
+      const TYPE_COLORS = {
+        domain: '#4ea1ff',
+        person: '#46d6a9',
+        concept: '#ffb454',
+        work: '#b084ff'
+      };
+
+      const DOMAIN_COLORS = {
+        '心理学': '#4ea1ff',
+        '人类学': '#46d6a9',
+        '脑科学': '#ffb454'
+      };
+
+      const RELATION_LABELS = {
+        belongs_to: '属于',
+        proposed: '提出',
+        inspired: '启发',
+        refined: '完善',
+        authored: '著作',
+        developed: '发展',
+        documented: '文献说明',
+        complements: '互补',
+        contextualizes: '提供背景',
+        supports: '支持',
+        operationalized_by: '通过……落实',
+        evidenced: '提供证据',
+        presented: '公开传播',
+        shapes: '塑造',
+        strengthened_by: '被强化于',
+        supports_foundation_for: '为……奠基',
+        reinforced_by: '被……加强',
+        enables: '支持',
+        implemented_with_attention_to: '实践时需考虑'
+      };
+
+      const state = {
+        data: null,
+        selectedNodeId: null,
+        selectedStage: null,
+        currentTab: 'graph',
+        filters: {
+          search: '',
+          domain: '全部',
+          type: '全部'
+        }
+      };
+
+      const el = {
+        stats: document.getElementById('stats'),
+        graphSvg: document.getElementById('graphSvg'),
+        graphLegend: document.getElementById('graphLegend'),
+        searchInput: document.getElementById('searchInput'),
+        domainSelect: document.getElementById('domainSelect'),
+        typeSelect: document.getElementById('typeSelect'),
+        timelineGrid: document.getElementById('timelineGrid'),
+        relationNodeList: document.getElementById('relationNodeList'),
+        relationInspector: document.getElementById('relationInspector'),
+        detailContent: document.getElementById('detailContent'),
+        tabs: document.getElementById('tabs')
+      };
+
+      init();
+
+      async function init() {
+        try {
+          const response = await fetch('./graph.json');
+          if (!response.ok) {
+            throw new Error('graph.json 加载失败');
+          }
+          const data = await response.json();
+          state.data = normalizeData(data);
+          buildDomainFilter();
+          renderStats();
+          renderLegend();
+          bindEvents();
+          renderAll();
+        } catch (error) {
+          document.body.innerHTML = `<div style="padding:32px;color:#fff;font-family:sans-serif;">页面加载失败：${error.message}<br/>请确认以 http 服务方式打开当前目录，而不是直接双击本地文件。</div>`;
+        }
+      }
+
+      function normalizeData(data) {
+        const nodeMap = new Map(data.nodes.map((node) => [node.id, node]));
+        const adjacency = new Map();
+        data.nodes.forEach((node) => adjacency.set(node.id, []));
+        data.edges.forEach((edge, index) => {
+          const source = nodeMap.get(edge.source);
+          const target = nodeMap.get(edge.target);
+          const normalized = {
+            ...edge,
+            id: `${edge.source}-${edge.target}-${index}`,
+            sourceNode: source,
+            targetNode: target
+          };
+          adjacency.get(edge.source)?.push({ ...normalized, direction: 'out' });
+          adjacency.get(edge.target)?.push({ ...normalized, direction: 'in' });
+        });
+        return { ...data, nodeMap, adjacency };
+      }
+
+      function bindEvents() {
+        el.searchInput.addEventListener('input', (event) => {
+          state.filters.search = event.target.value.trim().toLowerCase();
+          renderAll();
+        });
+
+        el.domainSelect.addEventListener('change', (event) => {
+          state.filters.domain = event.target.value;
+          renderAll();
+        });
+
+        el.typeSelect.addEventListener('change', (event) => {
+          state.filters.type = event.target.value;
+          renderAll();
+        });
+
+        el.tabs.addEventListener('click', (event) => {
+          const button = event.target.closest('.tab-btn');
+          if (!button) return;
+          state.currentTab = button.dataset.tab;
+          document.querySelectorAll('.tab-btn').forEach((item) => item.classList.toggle('active', item === button));
+          document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+          document.getElementById(`view-${state.currentTab}`).classList.add('active');
+          renderDetailPanel();
+        });
+      }
+
+      function buildDomainFilter() {
+        const domains = state.data.metadata.domains || [];
+        domains.forEach((domain) => {
+          const option = document.createElement('option');
+          option.value = domain;
+          option.textContent = domain;
+          el.domainSelect.appendChild(option);
+        });
+      }
+
+      function renderAll() {
+        renderGraph();
+        renderTimeline();
+        renderRelations();
+        renderDetailPanel();
+      }
+
+      function getFilteredNodes() {
+        return state.data.nodes.filter((node) => {
+          const matchDomain = state.filters.domain === '全部' || node.domain === state.filters.domain || node.name === state.filters.domain;
+          const matchType = state.filters.type === '全部' || node.type === state.filters.type;
+          const search = state.filters.search;
+          const matchSearch = !search || [node.name, node.name_zh, node.summary, node.author, node.domain]
+            .filter(Boolean)
+            .some((text) => String(text).toLowerCase().includes(search));
+          return matchDomain && matchType && matchSearch;
+        });
+      }
+
+      function getFilteredEdges(nodeIds) {
+        return state.data.edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+      }
+
+      function renderStats() {
+        const totalNodes = state.data.nodes.length;
+        const totalEdges = state.data.edges.length;
+        const totalTracks = state.data.development_tracks.length;
+        const totalDomains = state.data.metadata.domains.length;
+        const stats = [
+          ['节点总数', totalNodes],
+          ['关系总数', totalEdges],
+          ['发展轨迹', totalTracks],
+          ['学科维度', totalDomains]
+        ];
+        el.stats.innerHTML = stats
+          .map(([label, value]) => `
+            <div class="stat-card">
+              <div class="stat-label">${label}</div>
+              <div class="stat-value">${value}</div>
+            </div>
+          `)
+          .join('');
+      }
+
+      function renderLegend() {
+        const legendItems = TYPE_ORDER.map((type) => `
+          <div class="legend-item">
+            <span class="dot" style="background:${TYPE_COLORS[type]}"></span>
+            ${TYPE_LABELS[type]}
+          </div>
+        `).join('');
+        el.graphLegend.innerHTML = legendItems;
+      }
+
+      function renderGraph() {
+        const nodes = getFilteredNodes();
+        const nodeIds = new Set(nodes.map((node) => node.id));
+        const edges = getFilteredEdges(nodeIds);
+        const selectedId = state.selectedNodeId && nodeIds.has(state.selectedNodeId) ? state.selectedNodeId : null;
+        if (!selectedId && state.currentTab === 'graph') {
+          state.selectedNodeId = nodes[0]?.id || null;
+        }
+
+        const svg = el.graphSvg;
+        svg.innerHTML = '';
+
+        if (!nodes.length) {
+          svg.innerHTML = '<text x="50%" y="50%" fill="#94a3b8" text-anchor="middle">当前筛选条件下没有节点</text>';
+          return;
+        }
+
+        const domains = state.data.metadata.domains;
+        const width = 1180;
+        const height = 760;
+        const left = 120;
+        const top = 68;
+        const domainGap = 320;
+        const laneGap = 138;
+        const positionMap = new Map();
+
+        domains.forEach((domain, domainIndex) => {
+          const xCenter = left + domainIndex * domainGap;
+          const domainLabel = createSvg('text', {
+            x: xCenter,
+            y: 36,
+            class: 'domain-label',
+            'text-anchor': 'middle'
+          }, domain);
+          svg.appendChild(domainLabel);
+
+          TYPE_ORDER.forEach((type, laneIndex) => {
+            const yLane = top + laneIndex * laneGap;
+            const laneText = domainIndex === 0
+              ? createSvg('text', { x: 20, y: yLane + 4, class: 'lane-label' }, TYPE_LABELS[type])
+              : null;
+            if (laneText) svg.appendChild(laneText);
+
+            const bucket = nodes.filter((node) => {
+              if (type === 'domain') return node.type === 'domain' && node.name === domain;
+              return node.domain === domain && node.type === type;
+            });
+
+            if (!bucket.length) return;
+            const spacing = Math.min(92, Math.max(52, (height - 140) / Math.max(bucket.length, 1)));
+            const startY = yLane - ((bucket.length - 1) * spacing) / 2;
+            bucket.forEach((node, index) => {
+              const x = xCenter + ((index % 2 === 0 ? -1 : 1) * Math.min(42, Math.floor(index / 2) * 14));
+              const y = startY + index * spacing;
+              positionMap.set(node.id, { x, y });
+            });
+          });
+        });
+
+        const selectedNeighbors = new Set();
+        if (state.selectedNodeId) {
+          state.data.adjacency.get(state.selectedNodeId)?.forEach((edge) => {
+            selectedNeighbors.add(edge.source);
+            selectedNeighbors.add(edge.target);
+          });
+        }
+
+        edges.forEach((edge) => {
+          const source = positionMap.get(edge.source);
+          const target = positionMap.get(edge.target);
+          if (!source || !target) return;
+          const line = createSvg('line', {
+            x1: source.x,
+            y1: source.y,
+            x2: target.x,
+            y2: target.y,
+            class: `edge ${isEdgeActive(edge) ? 'active' : ''} ${isGraphDimmed(edge) ? 'dimmed' : ''}`
+          });
+          line.addEventListener('click', () => {
+            state.selectedNodeId = edge.source;
+            state.selectedStage = null;
+            renderAll();
+          });
+          svg.appendChild(line);
+        });
+
+        nodes.forEach((node) => {
+          const pos = positionMap.get(node.id);
+          if (!pos) return;
+          const g = createSvg('g', {
+            class: `node ${state.selectedNodeId === node.id ? 'active' : ''} ${isNodeDimmed(node.id, selectedNeighbors) ? 'dimmed' : ''}`,
+            transform: `translate(${pos.x}, ${pos.y})`
+          });
+          const radius = getNodeRadius(node.type);
+          const circle = createSvg('circle', {
+            r: radius,
+            fill: TYPE_COLORS[node.type],
+            stroke: node.domain ? DOMAIN_COLORS[node.domain] || '#fff' : '#d6e4ff',
+            'stroke-width': 1.5,
+            opacity: 0.94
+          });
+          const label = createSvg('text', { y: radius + 16 }, getNodeLabel(node));
+          g.appendChild(circle);
+          g.appendChild(label);
+          g.addEventListener('click', () => {
+            state.selectedNodeId = node.id;
+            state.selectedStage = null;
+            renderAll();
+          });
+          svg.appendChild(g);
+        });
+      }
+
+      function renderTimeline() {
+        const tracks = state.data.development_tracks.filter((track) => state.filters.domain === '全部' || track.domain === state.filters.domain);
+        if (!tracks.length) {
+          el.timelineGrid.innerHTML = '<div class="empty">当前筛选条件下没有可显示的发展轨迹。</div>';
+          return;
+        }
+
+        el.timelineGrid.innerHTML = tracks
+          .map((track) => `
+            <div class="track-card">
+              <div class="track-header">
+                <h3>${track.domain} · ${track.title}</h3>
+                <p>${track.summary}</p>
+              </div>
+              <div class="track-stages">
+                ${track.stages
+                  .map((stage) => `
+                    <div class="stage-card ${state.selectedStage?.key === stageKey(track, stage) ? 'active' : ''}" data-track="${track.id}" data-stage="${stageKey(track, stage)}">
+                      <div class="stage-year">${stage.year}</div>
+                      <div class="stage-title">${stage.title}</div>
+                      <div class="stage-summary">${stage.summary}</div>
+                    </div>
+                  `)
+                  .join('')}
+              </div>
+            </div>
+          `)
+          .join('');
+
+        el.timelineGrid.querySelectorAll('.stage-card').forEach((card) => {
+          card.addEventListener('click', () => {
+            const track = state.data.development_tracks.find((item) => item.id === card.dataset.track);
+            const stage = track.stages.find((item) => stageKey(track, item) === card.dataset.stage);
+            state.selectedStage = { ...stage, trackTitle: track.title, domain: track.domain, key: card.dataset.stage };
+            state.selectedNodeId = stage.node_refs?.[0] || null;
+            renderAll();
+          });
+        });
+      }
+
+      function renderRelations() {
+        const nodes = getFilteredNodes().filter((node) => node.type !== 'domain');
+        if (!nodes.length) {
+          el.relationNodeList.innerHTML = '<div class="empty">没有可用于关系浏览的节点。</div>';
+          el.relationInspector.innerHTML = '';
+          return;
+        }
+
+        if (!state.selectedNodeId || !nodes.some((node) => node.id === state.selectedNodeId)) {
+          state.selectedNodeId = nodes[0].id;
+        }
+
+        el.relationNodeList.innerHTML = nodes
+          .map((node) => `
+            <div class="node-list-item ${state.selectedNodeId === node.id ? 'active' : ''}" data-node-id="${node.id}">
+              <strong>${getNodeDisplayName(node)}</strong>
+              <small>${TYPE_LABELS[node.type]} · ${node.domain || '跨学科'}</small>
+            </div>
+          `)
+          .join('');
+
+        el.relationNodeList.querySelectorAll('.node-list-item').forEach((item) => {
+          item.addEventListener('click', () => {
+            state.selectedNodeId = item.dataset.nodeId;
+            state.selectedStage = null;
+            renderAll();
+          });
+        });
+
+        const node = state.data.nodeMap.get(state.selectedNodeId);
+        const adjacency = state.data.adjacency.get(state.selectedNodeId) || [];
+        const outgoing = adjacency.filter((edge) => edge.direction === 'out');
+        const incoming = adjacency.filter((edge) => edge.direction === 'in');
+        const related = adjacency.map((edge) => edge.direction === 'out' ? edge.targetNode : edge.sourceNode);
+
+        el.relationInspector.innerHTML = `
+          <div class="relation-card">
+            <h4>${getNodeDisplayName(node)}</h4>
+            <div class="hint">${TYPE_LABELS[node.type]} · ${node.domain || '跨学科'}</div>
+            <p class="detail-summary">${node.summary || '暂无摘要'}</p>
+          </div>
+          ${renderRelationGroup('向外连接', outgoing, 'out')}
+          ${renderRelationGroup('被谁连接', incoming, 'in')}
+          <div class="relation-card">
+            <h4>关联节点总览</h4>
+            <div class="relation-items">
+              ${related.length ? related.map((item) => relationChip(item)).join('') : '<span class="hint">暂无</span>'}
+            </div>
+          </div>
+        `;
+
+        el.relationInspector.querySelectorAll('[data-focus-node]').forEach((chip) => {
+          chip.addEventListener('click', () => {
+            state.selectedNodeId = chip.dataset.focusNode;
+            state.selectedStage = null;
+            renderAll();
+          });
+        });
+      }
+
+      function renderRelationGroup(title, edges, direction) {
+        return `
+          <div class="relation-card">
+            <h4>${title}</h4>
+            <div class="detail-list">
+              ${edges.length ? edges.map((edge) => {
+                const node = direction === 'out' ? edge.targetNode : edge.sourceNode;
+                return `
+                  <div class="detail-item">
+                    <strong>${getNodeDisplayName(node)}</strong>
+                    <p>关系：${RELATION_LABELS[edge.relation] || edge.relation}</p>
+                    <div class="relation-items" style="margin-top:10px;">
+                      ${relationChip(node)}
+                    </div>
+                  </div>
+                `;
+              }).join('') : '<div class="empty">暂无对应关系。</div>'}
+            </div>
+          </div>
+        `;
+      }
+
+      function relationChip(node) {
+        return `<span class="chip" data-focus-node="${node.id}">${getNodeDisplayName(node)} <small>${TYPE_LABELS[node.type]}</small></span>`;
+      }
+
+      function renderDetailPanel() {
+        if (state.selectedStage && state.currentTab === 'timeline') {
+          renderStageDetail();
+          return;
+        }
+        if (state.selectedNodeId && state.data.nodeMap.has(state.selectedNodeId)) {
+          renderNodeDetail();
+          return;
+        }
+        el.detailContent.innerHTML = '这里会展示当前选中节点/阶段的摘要、所属学科、相连节点、相关著作与关系说明。';
+      }
+
+      function renderStageDetail() {
+        const stage = state.selectedStage;
+        const refs = (stage.node_refs || []).map((id) => state.data.nodeMap.get(id)).filter(Boolean);
+        el.detailContent.innerHTML = `
+          <div class="detail-item">
+            <strong>${stage.domain} · ${stage.trackTitle}</strong>
+            <p>${stage.year} · ${stage.title}</p>
+            <p style="margin-top:10px;">${stage.summary}</p>
+          </div>
+          <div class="detail-section">
+            <h4>本阶段涉及节点</h4>
+            <div class="detail-list">
+              ${refs.map((node) => `
+                <div class="detail-item" data-detail-node="${node.id}">
+                  <strong>${getNodeDisplayName(node)}</strong>
+                  <p>${TYPE_LABELS[node.type]} · ${node.domain || '跨学科'}</p>
+                  <p style="margin-top:8px;">${node.summary || '暂无摘要'}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        bindDetailNodeLinks();
+      }
+
+      function renderNodeDetail() {
+        const node = state.data.nodeMap.get(state.selectedNodeId);
+        const adjacency = state.data.adjacency.get(node.id) || [];
+        const outgoing = adjacency.filter((edge) => edge.direction === 'out');
+        const incoming = adjacency.filter((edge) => edge.direction === 'in');
+        const relatedNodes = adjacency
+          .map((edge) => edge.direction === 'out' ? edge.targetNode : edge.sourceNode)
+          .filter(Boolean);
+
+        const domainOverview = node.domain ? state.data.domain_overviews[node.domain] : null;
+
+        el.detailContent.innerHTML = `
+          <div class="detail-item">
+            <strong>${getNodeDisplayName(node)}</strong>
+            <p>${TYPE_LABELS[node.type]}${node.domain ? ` · ${node.domain}` : ''}</p>
+            <p style="margin-top:10px;">${node.summary || '暂无摘要'}</p>
+          </div>
+          <div class="detail-section">
+            <h4>直接关系</h4>
+            <div class="detail-list">
+              ${[...outgoing, ...incoming].length ? [...outgoing, ...incoming].map((edge) => {
+                const target = edge.direction === 'out' ? edge.targetNode : edge.sourceNode;
+                return `
+                  <div class="detail-item" data-detail-node="${target.id}">
+                    <strong>${edge.direction === 'out' ? '→' : '←'} ${getNodeDisplayName(target)}</strong>
+                    <p>关系：${RELATION_LABELS[edge.relation] || edge.relation}</p>
+                    <p style="margin-top:8px;">${target.summary || '暂无摘要'}</p>
+                  </div>
+                `;
+              }).join('') : '<div class="empty">当前节点没有可显示的直接关系。</div>'}
+            </div>
+          </div>
+          <div class="detail-section">
+            <h4>关联节点总览</h4>
+            <div class="relation-items">
+              ${relatedNodes.length ? relatedNodes.map((item) => relationChip(item)).join('') : '<span class="hint">暂无</span>'}
+            </div>
+          </div>
+          ${domainOverview ? `
+            <div class="detail-section">
+              <h4>${node.domain} 观察视角</h4>
+              <div class="detail-item">
+                <strong>核心问题</strong>
+                <p>${domainOverview['核心问题'].join(' / ')}</p>
+                <strong style="margin-top:10px;">关键主张</strong>
+                <p>${domainOverview['关键主张'].join(' / ')}</p>
+              </div>
+            </div>
+          ` : ''}
+        `;
+
+        bindDetailNodeLinks();
+      }
+
+      function bindDetailNodeLinks() {
+        el.detailContent.querySelectorAll('[data-detail-node], [data-focus-node]').forEach((item) => {
+          item.addEventListener('click', () => {
+            const nextId = item.dataset.detailNode || item.dataset.focusNode;
+            state.selectedNodeId = nextId;
+            state.selectedStage = null;
+            state.currentTab = 'graph';
+            document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === 'graph'));
+            document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+            document.getElementById('view-graph').classList.add('active');
+            renderAll();
+          });
+        });
+      }
+
+      function getNodeRadius(type) {
+        return { domain: 16, person: 13, concept: 11, work: 10 }[type] || 10;
+      }
+
+      function getNodeLabel(node) {
+        const name = getNodeDisplayName(node);
+        return name.length > 16 ? `${name.slice(0, 14)}…` : name;
+      }
+
+      function getNodeDisplayName(node) {
+        if (!node) return '';
+        return node.name_zh || node.name;
+      }
+
+      function isEdgeActive(edge) {
+        return Boolean(state.selectedNodeId && (edge.source === state.selectedNodeId || edge.target === state.selectedNodeId));
+      }
+
+      function isGraphDimmed(edge) {
+        if (!state.selectedNodeId) return false;
+        return !(edge.source === state.selectedNodeId || edge.target === state.selectedNodeId);
+      }
+
+      function isNodeDimmed(nodeId, selectedNeighbors) {
+        if (!state.selectedNodeId) return false;
+        return nodeId !== state.selectedNodeId && !selectedNeighbors.has(nodeId);
+      }
+
+      function stageKey(track, stage) {
+        return `${track.id}-${stage.year}-${stage.title}`;
+      }
+
+      function createSvg(tag, attrs = {}, text = '') {
+        const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+        if (text) element.textContent = text;
+        return element;
+      }
+    </script>
+  </body>
+</html>

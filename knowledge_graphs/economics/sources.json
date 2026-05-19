@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "title": "经济学知识图谱资料来源",
+    "created_at": "2026-05-19",
+    "description": "用于构建 economics/graph.json 与 index.html 的公开资料来源。"
+  },
+  "sources": [
+    { "id": "src_britannica_economics", "title": "Encyclopaedia Britannica: Economics", "url": "https://www.britannica.com/money/economics", "used_for": ["经济学定义", "学科范围", "微观/宏观/发展经济学分支", "斯密与《国富论》历史地位"] },
+    { "id": "src_history_thought", "title": "Wikipedia: History of economic thought", "url": "https://en.wikipedia.org/wiki/History_of_economic_thought", "used_for": ["经济思想史阶段", "主要学派", "主要人物与概念脉络"] },
+    { "id": "src_nobel_economic_sciences", "title": "The Nobel Prize: Economic Sciences", "url": "https://www.nobelprize.org/prizes/economic-sciences/", "used_for": ["现代经济学代表性贡献", "诺贝尔经济学奖相关人物与领域"] },
+    { "id": "src_smith", "title": "Adam Smith", "url": "https://en.wikipedia.org/wiki/Adam_Smith", "used_for": ["亚当·斯密", "《国富论》", "分工与市场机制"] },
+    { "id": "src_ricardo", "title": "David Ricardo", "url": "https://en.wikipedia.org/wiki/David_Ricardo", "used_for": ["大卫·李嘉图", "比较优势", "古典分配理论"] },
+    { "id": "src_marx", "title": "Karl Marx", "url": "https://en.wikipedia.org/wiki/Karl_Marx", "used_for": ["马克思", "《资本论》", "剩余价值与政治经济学批判"] },
+    { "id": "src_keynes", "title": "John Maynard Keynes", "url": "https://en.wikipedia.org/wiki/John_Maynard_Keynes", "used_for": ["凯恩斯", "《通论》", "有效需求与宏观经济学"] },
+    { "id": "src_friedman", "title": "Milton Friedman", "url": "https://en.wikipedia.org/wiki/Milton_Friedman", "used_for": ["弗里德曼", "货币主义", "芝加哥学派"] },
+    { "id": "src_coase", "title": "Ronald Coase", "url": "https://en.wikipedia.org/wiki/Ronald_Coase", "used_for": ["科斯", "交易成本", "产权与外部性"] },
+    { "id": "src_behavioral", "title": "Behavioral economics", "url": "https://en.wikipedia.org/wiki/Behavioral_economics", "used_for": ["行为经济学", "前景理论", "助推"] }
+  ]
+}
